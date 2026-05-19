@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color: #111827;
+    background: #ffffff;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: #ffffff;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .portal-frame {
+    border-radius: 42px;
+  }
+
+  .map-grid {
+    background-image:
+      linear-gradient(rgba(15, 118, 110, 0.11) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 118, 110, 0.11) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .large-text {
+    font-size: 18px;
+  }
+
+  .high-contrast {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .high-contrast .hc-panel {
+    border-color: #000000 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .high-contrast .hc-panel * {
+    color: #000000 !important;
+  }
+
+  .high-contrast button {
+    border-color: #000000;
+  }
+
+  @media (max-width: 640px) {
+    .portal-frame {
+      border-radius: 28px;
+      border-width: 6px;
+    }
+  }
+}
