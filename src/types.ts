@@ -1,4 +1,4 @@
-export type PageId = "home" | "connect" | "digital" | "refurbishment" | "events" | "about";
+export type PageId = "home" | "connect" | "digital" | "refurbishment" | "events" | "dashboard" | "about" | "login";
 
 export type LocationTag =
   | "wifi"
@@ -22,11 +22,27 @@ export interface MapLocation {
   id: string;
   name: string;
   type: LocationType;
+  providerName: string;
   distance: string;
+  travelTime?: string;
   openingHours: string;
   address: string;
+  coordinatesLatLng?: {
+    lat: number;
+    lng: number;
+  };
   services: string[];
   accessibility: string;
+  nearestBusStop?: string;
+  hasSeating?: boolean;
+  whoFor?: string;
+  cost?: string;
+  contact?: string;
+  socialLinks?: {
+    instagram?: string;
+    facebook?: string;
+    website?: string;
+  };
   tags: LocationTag[];
   coordinates: {
     x: number;
@@ -40,6 +56,8 @@ export interface DigitalHelpTopic {
   explanation: string;
   guideSteps: string[];
   relatedTags: LocationTag[];
+  recommendedLocationId?: string;
+  recommendedEventId?: string;
 }
 
 export interface RefurbishmentPoint {
@@ -62,6 +80,10 @@ export interface CommunityEvent {
   audience: string;
   category: string;
   summary: string;
+  accessibility: string;
+  helpOffered: string;
+  locationId?: string;
+  contact?: string;
 }
 
 export interface Partner {
@@ -83,7 +105,6 @@ export interface Reward {
 }
 
 export interface PortalSettings {
-  simpleEnglish: boolean;
   largeText: boolean;
   highContrast: boolean;
   language: string;
@@ -92,4 +113,13 @@ export interface PortalSettings {
 export interface PortalUser {
   username: string;
   mode: "demo" | "guest";
+}
+
+export interface MockUserProfile {
+  name: string;
+  hasRefurbishedDevice: boolean;
+  deviceType: string;
+  deviceReceivedDate: string;
+  rewardPoints: number;
+  digitalHelpProgress: string;
 }

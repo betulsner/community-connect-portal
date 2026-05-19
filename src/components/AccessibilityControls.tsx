@@ -1,84 +1,68 @@
-import { BookOpen, Languages, Type, Volume2, Contrast } from "lucide-react";
+import { Contrast, Languages, Type } from "lucide-react";
+import { supportedLanguages, useI18n } from "../i18n";
 import type { PortalSettings } from "../types";
 
 interface AccessibilityControlsProps {
   settings: PortalSettings;
   onChange: (settings: PortalSettings) => void;
-  onReadAloud: () => void;
 }
 
-const languages = ["English", "Urdu", "Punjabi", "Bengali", "Polish", "Arabic", "Romanian"];
-
-export default function AccessibilityControls({
-  settings,
-  onChange,
-  onReadAloud
-}: AccessibilityControlsProps) {
+export default function AccessibilityControls({ settings, onChange }: AccessibilityControlsProps) {
+  const { t } = useI18n();
   const update = (partial: Partial<PortalSettings>) => onChange({ ...settings, ...partial });
 
   return (
-    <section className="border-b border-white/60 bg-lagoon-700 text-white" aria-label="Accessibility and language controls">
-      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => update({ simpleEnglish: !settings.simpleEnglish })}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white ${
-              settings.simpleEnglish ? "bg-white text-lagoon-700" : "bg-white/15 text-white hover:bg-white/25"
-            }`}
-            aria-pressed={settings.simpleEnglish}
-          >
-            <BookOpen size={16} aria-hidden="true" />
-            Simple English
-          </button>
-          <button
-            type="button"
-            onClick={() => update({ largeText: !settings.largeText })}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white ${
-              settings.largeText ? "bg-white text-lagoon-700" : "bg-white/15 text-white hover:bg-white/25"
-            }`}
-            aria-pressed={settings.largeText}
-          >
-            <Type size={16} aria-hidden="true" />
-            Large text
-          </button>
-          <button
-            type="button"
-            onClick={() => update({ highContrast: !settings.highContrast })}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white ${
-              settings.highContrast ? "bg-white text-lagoon-700" : "bg-white/15 text-white hover:bg-white/25"
-            }`}
-            aria-pressed={settings.highContrast}
-          >
-            <Contrast size={16} aria-hidden="true" />
-            High contrast
-          </button>
-          <button
-            type="button"
-            onClick={onReadAloud}
-            className="flex items-center gap-2 rounded-lg bg-white/15 px-3 py-2 text-sm font-bold text-white hover:bg-white/25 focus:outline-none focus:ring-2 focus:ring-white"
-          >
-            <Volume2 size={16} aria-hidden="true" />
-            Read aloud
-          </button>
-        </div>
-
-        <label className="flex min-w-fit items-center gap-2 text-sm font-bold">
-          <Languages size={16} aria-hidden="true" />
-          <span>Language</span>
+    <section className="bg-transparent text-ink" aria-label="Accessibility and language controls">
+      <div className="cc-accessibility-controls">
+        <label className="cc-accessibility-select">
+          <Languages size={18} aria-hidden="true" />
+          <span className="sr-only">{t("access.language")}</span>
           <select
             value={settings.language}
             onChange={(event) => update({ language: event.target.value })}
-            className="rounded-lg border border-white/40 bg-white px-3 py-2 text-sm font-bold text-ink focus:outline-none focus:ring-2 focus:ring-white"
-            aria-label="Select portal language"
+            className="cc-accessibility-native-select"
+            aria-label={t("access.selectLanguage")}
           >
-            {languages.map((language) => (
+            {supportedLanguages.map((language) => (
               <option key={language} value={language}>
                 {language}
               </option>
             ))}
           </select>
         </label>
+
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => update({ largeText: false })}
+            className={`cc-accessibility-button ${!settings.largeText ? "cc-accessibility-button--active" : ""}`}
+            aria-label={t("access.standardText")}
+          >
+            <Type size={17} aria-hidden="true" />
+            A-
+          </button>
+          <button
+            type="button"
+            onClick={() => update({ largeText: true })}
+            className={`cc-accessibility-button ${settings.largeText ? "cc-accessibility-button--active" : ""}`}
+            aria-label={t("access.largeText")}
+          >
+            A+
+          </button>
+        </div>
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => update({ highContrast: !settings.highContrast })}
+            className={`cc-accessibility-button cc-accessibility-button--contrast ${
+              settings.highContrast ? "cc-accessibility-button--active" : ""
+            }`}
+            aria-pressed={settings.highContrast}
+          >
+            <Contrast size={18} aria-hidden="true" />
+            <span>{t("access.highContrast")}</span>
+          </button>
+        </div>
       </div>
     </section>
   );

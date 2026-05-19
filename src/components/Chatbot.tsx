@@ -4,6 +4,7 @@ import { locations } from "../data/locations";
 import { refurbishmentPoints } from "../data/refurbishment";
 import { events } from "../data/events";
 import { partners } from "../data/partners";
+import { useI18n } from "../i18n";
 import type { PageId } from "../types";
 
 interface ChatbotProps {
@@ -15,13 +16,7 @@ interface Message {
   text: string;
 }
 
-const exampleQuestions = [
-  "Where can I get free Wi-Fi?",
-  "Where can I get a refurbished laptop?",
-  "What events are near me?",
-  "Where can I get help with a CV?",
-  "Which cafe has digital help today?"
-];
+const exampleQuestionKeys = ["chat.q1", "chat.q2", "chat.q3", "chat.q4", "chat.q5"];
 
 const scopeKeywords = [
   "ladywood",
@@ -34,7 +29,6 @@ const scopeKeywords = [
   "phone",
   "event",
   "cafe",
-  "café",
   "wifi",
   "wi-fi",
   "charging",
@@ -59,14 +53,10 @@ const scopeKeywords = [
 ];
 
 export default function Chatbot({ onNavigate }: ChatbotProps) {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      text: "Hi, I am City Helper. Ask me about Ladywood benches, free Wi-Fi, charging, digital help, events, cafes, and device support."
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const quickData = useMemo(
     () => ({
@@ -85,7 +75,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
     const lower = question.toLowerCase();
     const inScope = scopeKeywords.some((keyword) => lower.includes(keyword));
     if (!inScope) {
-      return "I can only help with Ladywood and Birmingham support, events, digital access, benches, and community services.";
+      return t("chat.scope");
     }
 
     if (lower.includes("wifi") || lower.includes("wi-fi") || lower.includes("internet")) {
@@ -116,11 +106,19 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
       return "For CVs and job applications, start with Ladywood Digital Drop-in or Spring Hill Library Hub. They can help with CV files, uploads, email, and online applications.";
     }
 
-    if (lower.includes("nhs") || lower.includes("benefit") || lower.includes("council") || lower.includes("email") || lower.includes("password") || lower.includes("print") || lower.includes("scan")) {
+    if (
+      lower.includes("nhs") ||
+      lower.includes("benefit") ||
+      lower.includes("council") ||
+      lower.includes("email") ||
+      lower.includes("password") ||
+      lower.includes("print") ||
+      lower.includes("scan")
+    ) {
       return "Digital support is available for email, passwords, NHS services, benefits, council forms, printing, scanning, and uploads. The Digital Help page lists each topic with nearby help and beginner guides.";
     }
 
-    if (lower.includes("cafe") || lower.includes("café")) {
+    if (lower.includes("cafe")) {
       return `Partner cafes and spaces include ${quickData.cafes
         .map((partner) => `${partner.name}, digital help ${partner.digitalHelpHours}`)
         .join(", ")}. Some offer coffee rewards through the portal.`;
@@ -152,51 +150,57 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-lg bg-ink px-4 py-3 text-sm font-extrabold text-white shadow-portal hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sun-500"
+        className="govuk-button fixed bottom-5 right-5 z-40 px-4 py-3 text-sm"
       >
         <Bot size={18} aria-hidden="true" />
-        Ask City Helper
+        {t("chat.button")}
       </button>
 
       {isOpen && (
         <section
-          className="fixed bottom-20 right-4 z-50 flex max-h-[78vh] w-[calc(100vw-2rem)] max-w-md flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-portal sm:right-5"
+          className="fixed bottom-20 right-4 z-50 flex max-h-[78vh] w-[calc(100vw-2rem)] max-w-md flex-col overflow-hidden border-2 border-ink bg-white sm:right-5"
           aria-label="City Helper chat"
         >
-          <div className="flex items-center justify-between bg-lagoon-700 px-4 py-3 text-white">
+          <div className="flex items-center justify-between bg-ink px-4 py-3 text-white">
             <div className="flex items-center gap-2">
               <Bot size={20} aria-hidden="true" />
-              <h2 className="font-black">Ask City Helper</h2>
+              <h2 className="font-black">{t("chat.button")}</h2>
             </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="rounded-lg p-2 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white"
-              aria-label="Close City Helper"
+              className="border-2 border-white bg-ink p-2 text-white hover:bg-slate-800"
+              aria-label={t("chat.close")}
             >
               <X size={18} aria-hidden="true" />
             </button>
           </div>
 
           <div className="flex flex-wrap gap-2 border-b border-slate-200 p-3">
-            {exampleQuestions.map((question) => (
-              <button
-                key={question}
-                type="button"
-                onClick={() => submitQuestion(question)}
-                className="rounded-lg bg-lagoon-50 px-3 py-2 text-left text-xs font-extrabold text-lagoon-700 hover:bg-lagoon-100 focus:outline-none focus:ring-2 focus:ring-sun-500"
-              >
-                {question}
-              </button>
-            ))}
+            {exampleQuestionKeys.map((questionKey) => {
+              const question = t(questionKey);
+              return (
+                <button
+                  key={questionKey}
+                  type="button"
+                  onClick={() => submitQuestion(question)}
+                  className="border-2 border-ink bg-white px-3 py-2 text-left text-xs font-bold text-ink hover:bg-lagoon-50"
+                >
+                  {question}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            <div className="border-2 border-slate-400 bg-lagoon-50 px-3 py-2 text-sm font-semibold leading-relaxed text-slate-800">
+              {t("chat.greeting")}
+            </div>
             {messages.map((message, index) => (
               <div
                 key={`${message.role}-${index}`}
-                className={`rounded-lg px-3 py-2 text-sm font-semibold leading-relaxed ${
-                  message.role === "assistant" ? "bg-slate-100 text-slate-800" : "ml-8 bg-sun-100 text-ink"
+                className={`border-2 px-3 py-2 text-sm font-semibold leading-relaxed ${
+                  message.role === "assistant" ? "border-slate-400 bg-lagoon-50 text-slate-800" : "ml-8 border-ink bg-white text-ink"
                 }`}
               >
                 {message.text}
@@ -213,20 +217,16 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
           >
             <div className="flex gap-2">
               <label htmlFor="city-helper-input" className="sr-only">
-                Ask City Helper
+                {t("chat.button")}
               </label>
               <input
                 id="city-helper-input"
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-ink focus:border-lagoon-700 focus:outline-none focus:ring-2 focus:ring-lagoon-700/20"
-                placeholder="Ask about local support"
+                className="min-w-0 flex-1 px-3 py-2 text-sm font-semibold text-ink"
+                placeholder={t("chat.placeholder")}
               />
-              <button
-                type="submit"
-                className="flex items-center justify-center rounded-lg bg-sun-500 px-3 py-2 text-white hover:bg-sun-600 focus:outline-none focus:ring-2 focus:ring-ink"
-                aria-label="Send question"
-              >
+              <button type="submit" className="govuk-button px-3 py-2" aria-label="Send question">
                 <Send size={18} aria-hidden="true" />
               </button>
             </div>
@@ -234,23 +234,23 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
               <button
                 type="button"
                 onClick={() => onNavigate("connect")}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-extrabold text-ink hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sun-500"
+                className="govuk-button govuk-button--secondary px-3 py-2 text-xs"
               >
-                Map
+                {t("chat.map")}
               </button>
               <button
                 type="button"
                 onClick={() => onNavigate("events")}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-extrabold text-ink hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sun-500"
+                className="govuk-button govuk-button--secondary px-3 py-2 text-xs"
               >
-                Events
+                {t("chat.events")}
               </button>
               <button
                 type="button"
                 onClick={() => onNavigate("refurbishment")}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-extrabold text-ink hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sun-500"
+                className="govuk-button govuk-button--secondary px-3 py-2 text-xs"
               >
-                Devices
+                {t("chat.devices")}
               </button>
             </div>
           </form>

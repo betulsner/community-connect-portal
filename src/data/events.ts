@@ -9,7 +9,25 @@ export const events: CommunityEvent[] = [
     price: "Free",
     audience: "Adults building confidence online",
     category: "Digital help",
-    summary: "Bring a phone, letter, form, or account question and get patient one-to-one support."
+    summary: "Bring a phone, letter, form, or account question.",
+    helpOffered: "Email, forms, NHS app, passwords, and basic phone help.",
+    accessibility: "Level entrance, seating, accessible toilet, and quiet support slots.",
+    locationId: "ladywood-health-centre",
+    contact: "Ask for the digital inclusion worker."
+  },
+  {
+    id: "cv-help-hour",
+    name: "CV Help Hour",
+    dateTime: "Thursday, 23 May, 10:00-11:00",
+    location: "Spring Hill Library Hub",
+    price: "Free",
+    audience: "People applying for work or volunteering",
+    category: "Jobs",
+    summary: "Get help writing, saving, and uploading a CV.",
+    helpOffered: "CVs, job searches, email attachments, and online applications.",
+    accessibility: "Ramp access, seating, and large-print forms available.",
+    locationId: "spring-hill-library",
+    contact: "Speak to the library help desk."
   },
   {
     id: "community-cafe-meetup",
@@ -19,7 +37,11 @@ export const events: CommunityEvent[] = [
     price: "Free drink for portal reward members",
     audience: "Residents living alone or new to the area",
     category: "Connection",
-    summary: "A relaxed table for conversation, local news, and introductions to nearby services."
+    summary: "A relaxed table for conversation and local news.",
+    helpOffered: "Friendly welcome, local signposting, and coffee rewards.",
+    accessibility: "Wide doorway, seating near sockets, and staff support.",
+    locationId: "bridge-cafe",
+    contact: "Speak to cafe staff."
   },
   {
     id: "beginner-computer-session",
@@ -29,7 +51,11 @@ export const events: CommunityEvent[] = [
     price: "Free",
     audience: "First-time computer users",
     category: "Digital skills",
-    summary: "Learn mouse, keyboard, search, email basics, and how to ask for help safely."
+    summary: "Learn computer basics at a gentle pace.",
+    helpOffered: "Mouse, keyboard, search, email basics, and online safety.",
+    accessibility: "Ramp access, seating, and staff nearby.",
+    locationId: "spring-hill-library",
+    contact: "Speak to the library help desk."
   },
   {
     id: "repair-refurb-event",
@@ -39,7 +65,11 @@ export const events: CommunityEvent[] = [
     price: "Free check; low-cost parts if needed",
     audience: "People with slow or broken laptops and phones",
     category: "Device support",
-    summary: "Volunteers check devices, advise on repair, and explain refurbished device routes."
+    summary: "Get a device checked and ask about refurbished devices.",
+    helpOffered: "Phone checks, laptop checks, setup help, and repair advice.",
+    accessibility: "Ground-floor workshop with seating and appointment support.",
+    locationId: "rework-ladywood",
+    contact: "Walk in during event hours."
   },
   {
     id: "coffee-connection",
@@ -49,7 +79,11 @@ export const events: CommunityEvent[] = [
     price: "Free",
     audience: "Anyone wanting a friendly local chat",
     category: "Community",
-    summary: "A small-group meetup with optional help finding clubs, classes, and support."
+    summary: "A small-group meetup with help finding local activities.",
+    helpOffered: "Community introductions and support signposting.",
+    accessibility: "Step-free access and quiet table available.",
+    locationId: "coffee-connect-event",
+    contact: "Ask at Canal Side Community Room."
   },
   {
     id: "volunteer-tech-buddy",
@@ -59,7 +93,11 @@ export const events: CommunityEvent[] = [
     price: "Free",
     audience: "Residents who can help others with basic digital tasks",
     category: "Volunteering",
-    summary: "Meet the coordinator and learn how short volunteer sessions support neighbours."
+    summary: "Learn how to help neighbours with basic digital tasks.",
+    helpOffered: "Volunteer induction and buddy session information.",
+    accessibility: "Seating available; accessibility information can be checked before attending.",
+    locationId: "ladywood-health-centre",
+    contact: "Ask for the volunteer coordinator."
   },
   {
     id: "language-support",
@@ -69,6 +107,10 @@ export const events: CommunityEvent[] = [
     price: "Free",
     audience: "Residents who prefer community language support",
     category: "Language support",
-    summary: "Friendly support with forms, online services, and signposting in community languages."
+    summary: "Support with forms and online services in community languages.",
+    helpOffered: "Forms, online services, and signposting in community languages.",
+    accessibility: "Step-free access; translation support by request.",
+    locationId: "summerfield-park-wifi",
+    contact: "Ask at Summerfield Community Centre."
   }
 ];

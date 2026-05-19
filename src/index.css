@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    color: #111827;
+    color: #0b0c0c;
     background: #ffffff;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -14,6 +14,9 @@
 
   * {
     box-sizing: border-box;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
   }
 
   body {
@@ -21,6 +24,8 @@
     min-width: 320px;
     min-height: 100vh;
     background: #ffffff;
+    color: #0b0c0c;
+    font-family: Helvetica, Arial, Inter, ui-sans-serif, system-ui, sans-serif;
   }
 
   button,
@@ -29,18 +34,468 @@
   select {
     font: inherit;
   }
+
+  a {
+    color: #1d70b8;
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, 0.0625rem);
+    text-underline-offset: 0.12em;
+  }
+
+  button,
+  input,
+  textarea,
+  select,
+  a {
+    border-radius: 0 !important;
+  }
+
+  button:focus-visible,
+  input:focus,
+  textarea:focus,
+  select:focus,
+  a:focus-visible,
+  .leaflet-container a:focus-visible {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+  }
+
+  input,
+  textarea,
+  select {
+    border: 2px solid #0b0c0c !important;
+    background: #ffffff;
+    color: #0b0c0c;
+  }
 }
 
 @layer components {
   .portal-frame {
-    border-radius: 42px;
+    border-radius: 0;
   }
 
-  .map-grid {
-    background-image:
-      linear-gradient(rgba(15, 118, 110, 0.11) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(15, 118, 110, 0.11) 1px, transparent 1px);
-    background-size: 42px 42px;
+  .govuk-width-container {
+    width: min(100% - 40px, 1200px);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .govuk-width-container {
+      width: min(100% - 64px, 1200px);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .govuk-width-container {
+      width: min(100% - 128px, 1200px);
+    }
+  }
+
+  .govuk-panel {
+    border: 2px solid #0b0c0c;
+    background: #ffffff;
+    color: #0b0c0c;
+  }
+
+  .govuk-inset {
+    border-left: 8px solid #b1b4b6;
+    background: #f3f2f1;
+  }
+
+  .govuk-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 6px !important;
+    background: #00703c;
+    color: #ffffff;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+
+  .govuk-button:hover {
+    background: #005a30;
+  }
+
+  .govuk-button--secondary {
+    border-color: #1d70b8;
+    background: #ffffff;
+    color: #003078;
+  }
+
+  .govuk-button--secondary:hover {
+    background: #e7f1ff;
+  }
+
+  .govuk-button--blue {
+    background: #1d70b8;
+  }
+
+  .govuk-button--blue:hover {
+    background: #003078;
+  }
+
+  .govuk-tag {
+    display: inline-flex;
+    border: 1px solid #0b0c0c;
+    background: #f3f2f1;
+    color: #0b0c0c;
+    font-weight: 700;
+  }
+
+  .govuk-link-button {
+    color: #1d70b8;
+    text-decoration: underline;
+    font-weight: 700;
+    background: transparent;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #d8dde3;
+    background: #ffffff;
+  }
+
+  .site-header .govuk-width-container {
+    width: min(100% - 40px, 1360px);
+  }
+
+  .site-header__inner {
+    display: flex;
+    min-height: 72px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .site-logo {
+    display: inline-flex;
+    min-width: 180px;
+    align-items: center;
+    gap: 0.75rem;
+    border: 0;
+    background: #ffffff;
+    color: #051b3f;
+    padding: 0.4rem 0;
+    text-align: left;
+  }
+
+  .site-logo:hover {
+    background: #f3f7fb;
+  }
+
+  .site-logo__mark {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 2px solid #005ea5;
+    color: #005ea5;
+  }
+
+  .site-logo__text span {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 0.95;
+  }
+
+  .site-nav {
+    display: none;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .site-nav__link {
+    min-height: 72px;
+    border: 0;
+    border-bottom: 4px solid transparent;
+    background: #ffffff;
+    color: #071b3a;
+    padding: 0 0.62rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .site-nav__link:hover {
+    border-bottom-color: #8eb8dc;
+    background: #f3f7fb;
+  }
+
+  .site-nav__link--active {
+    border-bottom-color: #005ea5;
+    color: #005ea5;
+  }
+
+  .site-header__actions {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-header__access {
+    display: none;
+  }
+
+  .site-dashboard-button {
+    min-height: 46px;
+    padding: 0 0.85rem;
+    white-space: nowrap;
+  }
+
+  .site-menu-button {
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    gap: 0.4rem;
+    border: 2px solid #071b3a;
+    border-radius: 6px !important;
+    background: #ffffff;
+    color: #071b3a;
+    padding: 0 0.8rem;
+    font-weight: 800;
+  }
+
+  .site-mobile-menu {
+    border-top: 1px solid #d8dde3;
+    background: #ffffff;
+    padding: 1rem 20px 1.25rem;
+  }
+
+  .site-mobile-menu__link {
+    display: block;
+    width: 100%;
+    border: 2px solid #071b3a;
+    background: #ffffff;
+    color: #071b3a;
+    margin-bottom: 0.6rem;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-weight: 800;
+  }
+
+  .site-mobile-menu__link--active {
+    background: #005ea5;
+    color: #ffffff;
+  }
+
+  .cc-accessibility-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .cc-accessibility-select,
+  .cc-accessibility-button {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid #c9d0d8;
+    border-radius: 6px !important;
+    background: #ffffff;
+    color: #071b3a;
+    padding: 0 0.62rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .cc-accessibility-native-select {
+    width: 96px;
+    min-height: 38px;
+    border: 0 !important;
+    background: #ffffff;
+    color: #071b3a;
+    font-weight: 800;
+  }
+
+  .cc-accessibility-button {
+    min-width: 46px;
+    justify-content: center;
+  }
+
+  .cc-accessibility-button--contrast {
+    min-width: 122px;
+  }
+
+  .cc-accessibility-button--active {
+    border-color: #071b3a;
+    background: #071b3a;
+    color: #ffffff;
+  }
+
+  .home-hero-real {
+    position: relative;
+    min-height: 540px;
+    overflow: hidden;
+    border-bottom: 1px solid #d8dde3;
+    background-color: #d8dde3;
+    background-image: url("./assets/ladywood-real.jpg");
+    background-position: center;
+    background-size: cover;
+  }
+
+  .home-hero-real__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(4, 22, 42, 0.92) 0%,
+      rgba(4, 22, 42, 0.82) 34%,
+      rgba(4, 22, 42, 0.34) 58%,
+      rgba(4, 22, 42, 0.04) 78%
+    );
+  }
+
+  .home-hero-real__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 540px;
+    align-items: center;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .cc-hero-button {
+    display: inline-flex;
+    width: 220px;
+    min-height: 56px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+
+  .cc-hero-button--blue {
+    background: #005ea5;
+  }
+
+  .cc-hero-button--blue:hover {
+    background: #003078;
+  }
+
+  .cc-hero-button--green {
+    background: #0f7b43;
+  }
+
+  .cc-hero-button--green:hover {
+    background: #005a30;
+  }
+
+  .need-card {
+    display: flex;
+    min-height: 252px;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #d8dde3;
+    border-radius: 8px !important;
+    background: #ffffff;
+    padding: 1.5rem 1.4rem 1.25rem;
+  }
+
+  .ladywood-map {
+    height: 520px;
+    min-height: 520px;
+    border: 2px solid #0b0c0c;
+    background: #f3f2f1;
+  }
+
+  .leaflet-container {
+    font: inherit;
+    color: #0b0c0c;
+    z-index: 0;
+  }
+
+  .leaflet-pane,
+  .leaflet-top,
+  .leaflet-bottom {
+    z-index: 1 !important;
+  }
+
+  .map-disabled .leaflet-container {
+    pointer-events: none;
+  }
+
+  .leaflet-control-zoom a {
+    border-radius: 0 !important;
+    color: #0b0c0c;
+    text-decoration: none;
+  }
+
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .gov-map-marker {
+    display: grid;
+    place-items: center;
+    width: 28px !important;
+    height: 28px !important;
+    margin-left: -14px !important;
+    margin-top: -14px !important;
+    border: 2px solid #0b0c0c;
+    background: #1d70b8;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .gov-map-marker--bench {
+    background: #00703c;
+  }
+
+  .gov-map-marker--cafe {
+    background: #4c2c92;
+  }
+
+  .gov-map-marker--device {
+    background: #d4351c;
+  }
+
+  .gov-map-marker--event {
+    background: #f47738;
+    color: #0b0c0c;
+  }
+
+  .cc-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 22, 42, 0.72);
+    padding: 1.5rem;
+  }
+
+  .cc-modal-content {
+    z-index: 1001;
+    width: min(100%, 42rem);
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 3px solid #071b3a;
+    border-radius: 8px !important;
+    background: #ffffff;
+    color: #071b3a;
+    padding: 1.5rem;
   }
 }
 
@@ -66,7 +521,6 @@
     border-color: #000000 !important;
     background: #ffffff !important;
     color: #000000 !important;
-    box-shadow: none !important;
   }
 
   .high-contrast .hc-panel * {
@@ -77,10 +531,103 @@
     border-color: #000000;
   }
 
+  .rounded,
+  .rounded-sm,
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-full {
+    border-radius: 4px !important;
+  }
+
   @media (max-width: 640px) {
-    .portal-frame {
-      border-radius: 28px;
-      border-width: 6px;
+    .home-hero-real,
+    .home-hero-real__content {
+      min-height: 480px;
+    }
+
+    .home-hero-real__overlay {
+      background: linear-gradient(90deg, rgba(4, 22, 42, 0.94) 0%, rgba(4, 22, 42, 0.74) 72%, rgba(4, 22, 42, 0.34) 100%);
+    }
+
+    .cc-hero-button {
+      width: 100%;
+    }
+
+    .ladywood-map {
+      height: 430px;
+      min-height: 430px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .site-nav,
+    .site-header__access {
+      display: flex;
+    }
+
+    .site-menu-button {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1279px) {
+    .site-header__inner {
+      min-height: 68px;
+    }
+
+    .site-logo {
+      min-width: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .site-header__actions {
+      gap: 0.4rem;
+    }
+
+    .site-dashboard-button {
+      width: 46px;
+      min-width: 46px;
+      padding: 0;
+    }
+
+    .site-dashboard-button__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .site-logo__text span {
+      font-size: 1.05rem;
+    }
+
+    .site-menu-button {
+      gap: 0.25rem;
+      padding: 0 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .site-logo__mark {
+      width: 38px;
+      height: 38px;
+    }
+
+    .cc-accessibility-controls {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .cc-accessibility-select,
+    .cc-accessibility-button,
+    .cc-accessibility-button--contrast {
+      width: 100%;
+      justify-content: flex-start;
     }
   }
 }

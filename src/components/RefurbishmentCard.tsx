@@ -1,4 +1,5 @@
 import { MapPin, Phone, Wrench } from "lucide-react";
+import { useI18n } from "../i18n";
 import type { RefurbishmentPoint } from "../types";
 
 interface RefurbishmentCardProps {
@@ -6,8 +7,10 @@ interface RefurbishmentCardProps {
 }
 
 export default function RefurbishmentCard({ point }: RefurbishmentCardProps) {
+  const { t } = useI18n();
+
   return (
-    <article className="hc-panel rounded-lg border border-slate-200 bg-white p-5 shadow-lift">
+    <article className="hc-panel govuk-panel p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="flex items-center gap-2 text-sm font-extrabold text-lagoon-700">
@@ -16,17 +19,17 @@ export default function RefurbishmentCard({ point }: RefurbishmentCardProps) {
           </p>
           <h3 className="mt-2 text-xl font-black text-ink">{point.name}</h3>
         </div>
-        <span className="rounded-lg bg-indigo-50 px-3 py-1 text-sm font-extrabold text-indigo-700">{point.cost}</span>
+        <span className="govuk-tag px-3 py-1 text-sm">{point.cost}</span>
       </div>
 
       <p className="mt-4 text-sm font-semibold text-slate-700">
-        <span className="font-extrabold text-ink">Open: </span>
+        <span className="font-extrabold text-ink">{t("refurb.open")}: </span>
         {point.openDays}
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {point.offers.map((offer) => (
-          <span key={offer} className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-extrabold text-slate-700">
+          <span key={offer} className="govuk-tag px-3 py-1 text-xs">
             {offer}
           </span>
         ))}

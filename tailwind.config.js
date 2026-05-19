@@ -5,26 +5,26 @@ export default {
     extend: {
       colors: {
         lagoon: {
-          50: "#effdfb",
-          100: "#d8f7f3",
-          300: "#7fe2db",
-          500: "#17b9b2",
-          700: "#0f766e"
+          50: "#f3f2f1",
+          100: "#e7f1f8",
+          300: "#5694ca",
+          500: "#1d70b8",
+          700: "#1d70b8"
         },
         sun: {
-          100: "#ffe8cc",
-          400: "#fb923c",
-          500: "#f97316",
-          600: "#ea580c"
+          100: "#f3f2f1",
+          400: "#00703c",
+          500: "#00703c",
+          600: "#005a30"
         },
-        ink: "#111827"
+        ink: "#0b0c0c"
       },
       boxShadow: {
-        portal: "0 24px 70px rgba(12, 74, 110, 0.24)",
-        lift: "0 14px 40px rgba(15, 23, 42, 0.12)"
+        portal: "none",
+        lift: "none"
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "Segoe UI", "Arial", "sans-serif"]
+        sans: ["Helvetica", "Arial", "Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       }
     }
   },

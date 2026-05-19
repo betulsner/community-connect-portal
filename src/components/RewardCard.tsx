@@ -7,9 +7,9 @@ interface RewardCardProps {
 
 export default function RewardCard({ reward }: RewardCardProps) {
   return (
-    <article className="hc-panel rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="hc-panel govuk-panel p-5">
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-sun-100 text-sun-600">
+        <div className="flex h-12 w-12 items-center justify-center border-2 border-ink bg-lagoon-50 text-ink">
           <Gift size={22} aria-hidden="true" />
         </div>
         <div>

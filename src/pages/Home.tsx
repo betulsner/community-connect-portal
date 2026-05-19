@@ -1,151 +1,105 @@
-import { BatteryCharging, CalendarDays, Coffee, HeartHandshake, MapPin, Trophy, Wifi, Wrench } from "lucide-react";
-import Hero from "../components/Hero";
-import RewardCard from "../components/RewardCard";
-import { partners } from "../data/partners";
-import { rewards } from "../data/rewards";
+import { ArrowRight, CalendarDays, Laptop, MapPin, UserCircle, Users } from "lucide-react";
+import { useI18n } from "../i18n";
 import type { PageId } from "../types";
 
 interface HomeProps {
   onNavigate: (page: PageId) => void;
-  onLogin: () => void;
 }
 
-const quickLinks: Array<{ title: string; text: string; page: PageId; icon: React.ElementType }> = [
+const cards: Array<{ titleKey: string; textKey: string; buttonKey: string; page: PageId; icon: React.ElementType }> = [
   {
-    title: "Local map",
-    text: "Benches, Wi-Fi, charging, support centres, events, cafes, and device help.",
+    titleKey: "home.card.services.title",
+    textKey: "home.card.services.text",
+    buttonKey: "common.viewDetails",
     page: "connect",
     icon: MapPin
   },
   {
-    title: "Digital confidence",
-    text: "Email, CVs, benefits, NHS services, printing, passwords, and online safety.",
-    page: "digital",
-    icon: HeartHandshake
-  },
-  {
-    title: "Devices and data",
-    text: "Refurbished laptops, repairs, donation points, social tariff guidance, and mobile data support.",
-    page: "refurbishment",
-    icon: Wrench
-  },
-  {
-    title: "Events nearby",
-    text: "Coffee meetups, beginner computer sessions, repair events, volunteering, and language support.",
+    titleKey: "home.card.events.title",
+    textKey: "home.card.events.text",
+    buttonKey: "common.viewDetails",
     page: "events",
     icon: CalendarDays
+  },
+  {
+    titleKey: "home.card.devices.title",
+    textKey: "home.card.devices.text",
+    buttonKey: "common.viewDetails",
+    page: "refurbishment",
+    icon: Laptop
+  },
+  {
+    titleKey: "home.card.dashboard.title",
+    textKey: "home.card.dashboard.text",
+    buttonKey: "common.openDashboard",
+    page: "dashboard",
+    icon: UserCircle
   }
 ];
 
-const earningWays = [
-  "Attending digital help sessions",
-  "Joining local events",
-  "Completing beginner digital guides",
-  "Visiting partner cafes",
-  "Joining repair or refurbishment events"
-];
+export default function Home({ onNavigate }: HomeProps) {
+  const { t } = useI18n();
 
-export default function Home({ onNavigate, onLogin }: HomeProps) {
   return (
     <>
-      <Hero onNavigate={onNavigate} onLogin={onLogin} />
+      <section className="home-hero-real">
+        <div className="home-hero-real__overlay" aria-hidden="true" />
+        <div className="govuk-width-container home-hero-real__content">
+          <div className="max-w-3xl">
+            <h1 className="text-5xl font-black leading-tight tracking-normal text-white md:text-6xl lg:text-7xl">
+              {t("home.title")}
+            </h1>
+            <p className="mt-6 max-w-2xl text-xl font-semibold leading-relaxed text-white md:text-2xl">
+              {t("home.subtitle")}
+            </p>
 
-      <section className="bg-white py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {quickLinks.map((link) => {
-              const Icon = link.icon;
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <button type="button" onClick={() => onNavigate("connect")} className="cc-hero-button cc-hero-button--blue">
+                <MapPin size={24} aria-hidden="true" />
+                {t("home.openMap")}
+              </button>
+              <button type="button" onClick={() => onNavigate("digital")} className="cc-hero-button cc-hero-button--green">
+                <Users size={24} aria-hidden="true" />
+                {t("home.findDigital")}
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate("refurbishment")}
+              className="mt-7 inline-flex min-h-11 items-center gap-3 text-lg font-bold text-white underline decoration-2 underline-offset-4 hover:text-yellow-200"
+            >
+              {t("home.refurbLink")}
+              <ArrowRight size={22} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-14 md:py-16" aria-labelledby="home-needs-heading">
+        <div className="govuk-width-container">
+          <h2 id="home-needs-heading" className="text-4xl font-black leading-tight text-ink md:text-5xl">
+            {t("home.needTitle")}
+          </h2>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {cards.map((card) => {
+              const Icon = card.icon;
               return (
-                <article key={link.title} className="hc-panel rounded-lg border border-slate-200 bg-white p-5 shadow-lift">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-lagoon-50 text-lagoon-700">
-                    <Icon size={24} aria-hidden="true" />
-                  </div>
-                  <h2 className="mt-4 text-xl font-black text-ink">{link.title}</h2>
-                  <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-700">{link.text}</p>
+                <article key={card.titleKey} className="need-card">
+                  <Icon size={42} className="mx-auto text-green-700" aria-hidden="true" />
+                  <h3 className="mt-5 text-center text-xl font-black leading-snug text-ink">{t(card.titleKey)}</h3>
+                  <p className="mt-4 text-center text-base font-semibold leading-relaxed text-slate-700">{t(card.textKey)}</p>
                   <button
                     type="button"
-                    onClick={() => onNavigate(link.page)}
-                    className="mt-5 rounded-lg bg-ink px-4 py-3 text-sm font-extrabold text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sun-500"
+                    onClick={() => onNavigate(card.page)}
+                    className="govuk-button govuk-button--secondary mt-auto w-full px-5 py-3 text-base"
                   >
-                    Open
+                    {t(card.buttonKey)}
                   </button>
                 </article>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-lagoon-50 py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-sm font-extrabold uppercase text-lagoon-700">Cafes and Community Partners</p>
-            <h2 className="mt-2 text-3xl font-black text-ink">Friendly places linked to the bench network.</h2>
-          </div>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {partners.map((partner) => (
-              <article key={partner.id} className="hc-panel rounded-lg border border-slate-200 bg-white p-5 shadow-lift">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="flex items-center gap-2 text-sm font-extrabold text-lagoon-700">
-                      <Coffee size={17} aria-hidden="true" />
-                      Community partner
-                    </p>
-                    <h3 className="mt-2 text-xl font-black text-ink">{partner.name}</h3>
-                  </div>
-                  <span className="rounded-lg bg-sun-100 px-3 py-1 text-xs font-extrabold text-sun-600">
-                    {partner.reward}
-                  </span>
-                </div>
-                <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700">
-                  <p className="flex gap-2">
-                    <Wifi size={18} className={partner.wifi ? "text-lagoon-700" : "text-slate-400"} aria-hidden="true" />
-                    Wi-Fi {partner.wifi ? "available" : "not listed"}
-                  </p>
-                  <p className="flex gap-2">
-                    <BatteryCharging size={18} className={partner.charging ? "text-lagoon-700" : "text-slate-400"} aria-hidden="true" />
-                    Charging {partner.charging ? "available" : "not listed"}
-                  </p>
-                  <p>
-                    <span className="font-extrabold text-ink">Digital help: </span>
-                    {partner.digitalHelpHours}
-                  </p>
-                  <p>
-                    <span className="font-extrabold text-ink">Address: </span>
-                    {partner.address}
-                  </p>
-                  <p>
-                    <span className="font-extrabold text-ink">Opening hours: </span>
-                    {partner.openingHours}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-14">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-          <div>
-            <p className="text-sm font-extrabold uppercase text-lagoon-700">Rewards</p>
-            <h2 className="mt-2 text-3xl font-black text-ink">Small rewards for building connection.</h2>
-            <div className="mt-5 rounded-lg bg-lagoon-50 p-5">
-              <p className="flex items-center gap-2 text-sm font-extrabold text-lagoon-700">
-                <Trophy size={18} aria-hidden="true" />
-                Earn points by
-              </p>
-              <ul className="mt-4 space-y-2 text-sm font-bold text-slate-700">
-                {earningWays.map((way) => (
-                  <li key={way}>{way}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {rewards.map((reward) => (
-              <RewardCard key={reward.id} reward={reward} />
-            ))}
           </div>
         </div>
       </section>

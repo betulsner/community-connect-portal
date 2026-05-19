@@ -41,6 +41,7 @@ const server = createServer(async (request, response) => {
     const filePath = await findFile(request.url ?? "/");
     const extension = extname(filePath);
     response.setHeader("Content-Type", mimeTypes[extension] ?? "application/octet-stream");
+    response.setHeader("Cache-Control", "no-store");
 
     if (request.method === "HEAD") {
       response.statusCode = 200;
