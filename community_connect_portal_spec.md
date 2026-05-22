@@ -64,10 +64,9 @@ The website should follow these principles:
    - Do not ask for unnecessary personal data.
 
 4. **Accessible**
+   - Clear, simple English by default.
    - Large text option.
    - High contrast option.
-   - Read-aloud option.
-   - Simple English option.
    - Language selection.
 
 5. **Trustworthy**
@@ -103,41 +102,49 @@ The AI chatbot should **not** be a main page. It should be a small side feature 
 
 ### Purpose
 
-The home page should welcome users and guide them to the most important support quickly.
+The home page should feel like a calm local public service portal and guide users to the most important actions quickly.
 
-### Header
+### Header (Implemented)
 
-Title:
+The header is a clean civic-style bar with:
 
-> Community Connect
+- Logo/name: Community Connect (left)
+- Navigation links (desktop): Home, Connect with the City, Digital Help, Refurbishment, Events
+- Compact accessibility controls (right): language selector, A-/A+, high contrast
+- Green Dashboard button (far right)
+- Mobile: navigation collapses into a simple Menu
 
-Subtitle:
+### Hero (Implemented)
 
-> Free Wi-Fi, charging, local support, and events around Ladywood.
+The hero uses a realistic Ladywood/Birmingham photo background with a dark navy overlay behind text only.
 
-### Main Buttons
+Heading:
 
-Use large clear buttons:
+> Welcome to Community Connect
 
-1. Find nearby support
-2. See local events
-3. Get digital help
-4. Device & internet support
-5. Café/community partners
-6. Change language
+Subheading:
 
-### Extra Home Page Elements
+> Find free Wi-Fi, digital help, events, and refurbished device support in Ladywood.
 
-Include:
+Primary actions (two buttons only):
 
-- Wi-Fi status: “You are connected to free Community Connect Wi-Fi.”
-- Current bench/location name, for example: “Port Loop Bench” or “Ladywood Park Bench.”
-- Small notice: “This portal helps you find local Ladywood and Birmingham support.”
-- A side button: “Ask the City Helper”
+1. Open the map (blue)
+2. Find digital help (green)
 
-### Home Page Tone
+Secondary link:
 
-Friendly, direct, and calm. Do not overload the user with too much text.
+> Looking for refurbished devices? →
+
+### “What do you need today?” cards (Implemented)
+
+Exactly four cards are shown:
+
+1. Find nearby services (map)
+2. Join an event (events)
+3. Get device support (refurbishment)
+4. My dashboard (dashboard)
+
+Each card is a simple bordered panel with a clear text button.
 
 ---
 
@@ -146,6 +153,14 @@ Friendly, direct, and calm. Do not overload the user with too much text.
 ### Purpose
 
 The map helps users find nearby services and support points.
+
+### Map (Implemented)
+
+The map is interactive and uses Leaflet + OpenStreetMap tiles.
+
+- Center: Ladywood, Birmingham (lat 52.476, lng -1.918)
+- Default zoom: 15
+- Performance: the map is lazy-loaded only when the Map page is opened
 
 ### Map Categories
 
@@ -171,11 +186,33 @@ When a user selects a place, show:
 - Type of support
 - Distance from current bench
 - Opening hours
-- Cost/free status
 - Accessibility information
 - Contact or website if available
-- Button: “Get directions”
-- Button: “Show similar places”
+- Button: “Get directions” (opens Google Maps directions in a new tab)
+- Button: “More info” (opens a modal)
+
+### “More info” modal (Implemented)
+
+When “More info” is clicked, a clear modal opens above the map and the map cannot be interacted with behind it.
+
+The modal includes:
+
+- Provider name
+- Type of support
+- Short description/services
+- Opening hours
+- Address
+- Accessibility information
+- Contact details
+- Social links if available
+- Get directions button
+- Close button
+
+Accessibility behavior:
+
+- Escape closes the modal
+- Focus is trapped while open
+- Focus returns to the button that opened it
 
 ### Example Location Card
 
@@ -528,7 +565,7 @@ The chatbot should:
 
 # 8. Navigation Design
 
-Use a simple bottom navigation bar or large home buttons.
+Use a simple top navigation plus large clear primary buttons on the Home page.
 
 Recommended navigation:
 
@@ -540,7 +577,7 @@ Recommended navigation:
 
 The City Helper button should float at the bottom-right corner.
 
-The accessibility/language button should be visible at the top-right corner.
+The accessibility/language controls should be visible in the header on desktop and within the mobile menu on small screens.
 
 ---
 
@@ -558,8 +595,8 @@ The website should look:
 
 Suggested style:
 
-- Large rounded buttons
-- Simple icons
+- Large clear buttons (minimum 44px height)
+- Simple line icons only where they improve clarity
 - High contrast text
 - Plenty of spacing
 - Minimal pages
