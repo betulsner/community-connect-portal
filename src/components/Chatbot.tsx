@@ -1,9 +1,5 @@
-import { useMemo, useState } from "react";
-import { Bot, Send, X } from "lucide-react";
-import { locations } from "../data/locations";
-import { refurbishmentPoints } from "../data/refurbishment";
-import { events } from "../data/events";
-import { partners } from "../data/partners";
+import { useEffect, useRef, useState } from "react";
+import { Bot, Loader2, Send, X } from "lucide-react";
 import { useI18n } from "../i18n";
 import type { PageId } from "../types";
 
@@ -18,131 +14,54 @@ interface Message {
 
 const exampleQuestionKeys = ["chat.q1", "chat.q2", "chat.q3", "chat.q4", "chat.q5"];
 
-const scopeKeywords = [
-  "ladywood",
-  "birmingham",
-  "support",
-  "digital",
-  "refurb",
-  "device",
-  "laptop",
-  "phone",
-  "event",
-  "cafe",
-  "wifi",
-  "wi-fi",
-  "charging",
-  "bench",
-  "open",
-  "hours",
-  "direction",
-  "cv",
-  "nhs",
-  "benefit",
-  "email",
-  "print",
-  "scan",
-  "password",
-  "job",
-  "repair",
-  "data",
-  "internet",
-  "library",
-  "community",
-  "coffee"
-];
-
 export default function Chatbot({ onNavigate }: ChatbotProps) {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const quickData = useMemo(
-    () => ({
-      wifi: locations.filter((location) => location.tags.includes("wifi")).slice(0, 4),
-      charging: locations.filter((location) => location.tags.includes("charging")),
-      benches: locations.filter((location) => location.type === "Community Connect Bench"),
-      digital: locations.filter((location) => location.tags.includes("digital-help")).slice(0, 3),
-      devices: refurbishmentPoints.slice(0, 3),
-      cafes: partners.filter((partner) => partner.wifi || partner.charging).slice(0, 3),
-      events: events.slice(0, 3)
-    }),
-    []
-  );
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
-  const buildResponse = (question: string) => {
-    const lower = question.toLowerCase();
-    const inScope = scopeKeywords.some((keyword) => lower.includes(keyword));
-    if (!inScope) {
-      return t("chat.scope");
-    }
-
-    if (lower.includes("wifi") || lower.includes("wi-fi") || lower.includes("internet")) {
-      return `Free Wi-Fi is available at ${quickData.wifi
-        .map((location) => `${location.name} (${location.distance})`)
-        .join(", ")}. Open the Connect with the City map to filter by Wi-Fi.`;
-    }
-
-    if (lower.includes("charging") || lower.includes("charge")) {
-      return `Charging is listed at ${quickData.charging
-        .map((location) => `${location.name} (${location.openingHours})`)
-        .join(", ")}. Use the map charging filter for the nearest option.`;
-    }
-
-    if (lower.includes("refurb") || lower.includes("device") || lower.includes("laptop") || lower.includes("repair")) {
-      return `For refurbished devices, try ${quickData.devices
-        .map((point) => `${point.name} in ${point.area}`)
-        .join(", ")}. The Refurbishment page also shows eligibility, repair events, social tariff guidance, and mobile data support.`;
-    }
-
-    if (lower.includes("event") || lower.includes("meet") || lower.includes("coffee") || lower.includes("volunteer")) {
-      return `Upcoming local events include ${quickData.events
-        .map((event) => `${event.name} at ${event.location} (${event.dateTime})`)
-        .join(", ")}. The Events page has reminder buttons and map links.`;
-    }
-
-    if (lower.includes("cv") || lower.includes("job")) {
-      return "For CVs and job applications, start with Ladywood Digital Drop-in or Spring Hill Library Hub. They can help with CV files, uploads, email, and online applications.";
-    }
-
-    if (
-      lower.includes("nhs") ||
-      lower.includes("benefit") ||
-      lower.includes("council") ||
-      lower.includes("email") ||
-      lower.includes("password") ||
-      lower.includes("print") ||
-      lower.includes("scan")
-    ) {
-      return "Digital support is available for email, passwords, NHS services, benefits, council forms, printing, scanning, and uploads. The Digital Help page lists each topic with nearby help and beginner guides.";
-    }
-
-    if (lower.includes("cafe")) {
-      return `Partner cafes and spaces include ${quickData.cafes
-        .map((partner) => `${partner.name}, digital help ${partner.digitalHelpHours}`)
-        .join(", ")}. Some offer coffee rewards through the portal.`;
-    }
-
-    if (lower.includes("bench")) {
-      return `Community Connect Bench points in this prototype include ${quickData.benches
-        .map((bench) => `${bench.name} at ${bench.address}`)
-        .join(", ")}. Each bench links to free Wi-Fi, charging, support routes, and local events.`;
-    }
-
-    if (lower.includes("direction") || lower.includes("where") || lower.includes("open") || lower.includes("hours")) {
-      return "Use Connect with the City for marker cards with distance, opening hours, accessibility notes, directions preview, and more info.";
-    }
-
-    return "The best next step is the Connect with the City map. It can filter Ladywood support by Wi-Fi, charging, digital help, refurbished devices, events, accessibility, and open today.";
-  };
-
-  const submitQuestion = (question: string) => {
+  const submitQuestion = async (question: string) => {
     const clean = question.trim();
-    if (!clean) return;
-    const answer = buildResponse(clean);
-    setMessages((current) => [...current, { role: "user", text: clean }, { role: "assistant", text: answer }]);
+    if (!clean || loading) return;
+
+    const next: Message[] = [...messages, { role: "user", text: clean }];
+    setMessages(next);
     setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: next.map((m) => ({ role: m.role, content: m.text })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Request failed");
+      }
+
+      setMessages((prev) => [...prev, { role: "assistant", text: data.reply }]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: "Sorry, I could not reach the assistant right now. Please check your connection and try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -184,7 +103,8 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
                   key={questionKey}
                   type="button"
                   onClick={() => submitQuestion(question)}
-                  className="border-2 border-ink bg-white px-3 py-2 text-left text-xs font-bold text-ink hover:bg-lagoon-50"
+                  disabled={loading}
+                  className="border-2 border-ink bg-white px-3 py-2 text-left text-xs font-bold text-ink hover:bg-lagoon-50 disabled:opacity-50"
                 >
                   {question}
                 </button>
@@ -193,19 +113,37 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            <div className="border border-amber-300 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-slate-700">
+              Your messages are sent to OpenAI to generate responses and are not stored by this
+              service. Do not share personal details such as your NHS number, date of birth, or
+              passwords — visit a local support venue for those topics.
+            </div>
+
             <div className="border-2 border-slate-400 bg-lagoon-50 px-3 py-2 text-sm font-semibold leading-relaxed text-slate-800">
               {t("chat.greeting")}
             </div>
+
             {messages.map((message, index) => (
               <div
                 key={`${message.role}-${index}`}
                 className={`border-2 px-3 py-2 text-sm font-semibold leading-relaxed ${
-                  message.role === "assistant" ? "border-slate-400 bg-lagoon-50 text-slate-800" : "ml-8 border-ink bg-white text-ink"
+                  message.role === "assistant"
+                    ? "border-slate-400 bg-lagoon-50 text-slate-800"
+                    : "ml-8 border-ink bg-white text-ink"
                 }`}
               >
                 {message.text}
               </div>
             ))}
+
+            {loading && (
+              <div className="flex items-center gap-2 border-2 border-slate-400 bg-lagoon-50 px-3 py-2 text-sm font-semibold text-slate-600">
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                Thinking...
+              </div>
+            )}
+
+            <div ref={bottomRef} />
           </div>
 
           <form
@@ -223,10 +161,16 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
                 id="city-helper-input"
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                className="min-w-0 flex-1 px-3 py-2 text-sm font-semibold text-ink"
+                disabled={loading}
+                className="min-w-0 flex-1 px-3 py-2 text-sm font-semibold text-ink disabled:opacity-50"
                 placeholder={t("chat.placeholder")}
               />
-              <button type="submit" className="govuk-button px-3 py-2" aria-label="Send question">
+              <button
+                type="submit"
+                disabled={loading || !input.trim()}
+                className="govuk-button px-3 py-2 disabled:opacity-50"
+                aria-label="Send question"
+              >
                 <Send size={18} aria-hidden="true" />
               </button>
             </div>

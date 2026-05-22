@@ -1,28 +1,5 @@
-import { createServer } from "node:http";
-import { createReadStream, existsSync, readFileSync } from "node:fs";
-import { stat, readFile } from "node:fs/promises";
-import { extname, join, resolve } from "node:path";
-import { build } from "vite";
+import type { Handler, HandlerEvent } from "@netlify/functions";
 import OpenAI from "openai";
-
-const host = "127.0.0.1";
-const port = Number(process.env.PORT ?? 5173);
-const root = process.cwd();
-const dist = resolve(root, "dist");
-
-// Load .env.local so OPENAI_API_KEY is available without a separate export step
-const envPath = resolve(root, ".env.local");
-if (existsSync(envPath)) {
-  for (const line of readFileSync(envPath, "utf8").split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const eqIndex = trimmed.indexOf("=");
-    if (eqIndex === -1) continue;
-    const key = trimmed.slice(0, eqIndex).trim();
-    const value = trimmed.slice(eqIndex + 1).trim().replace(/^["']|["']$/g, "");
-    if (key) process.env[key] = value;
-  }
-}
 
 const SYSTEM_PROMPT = `You are City Helper, a friendly community assistant for Ladywood, Birmingham, UK.
 Your sole purpose is to help Ladywood residents find local services, events, and digital support.
@@ -91,58 +68,42 @@ FREE WI-FI OUTDOORS:
 const MAX_MESSAGE_CHARS = 500;
 const MAX_HISTORY_MESSAGES = 10;
 
-async function parseJsonBody(request) {
-  return new Promise((resolve, reject) => {
-    let data = "";
-    request.on("data", (chunk) => (data += chunk));
-    request.on("end", () => {
-      try {
-        resolve(JSON.parse(data));
-      } catch {
-        reject(new Error("Invalid JSON"));
-      }
-    });
-    request.on("error", reject);
-  });
-}
+export const handler: Handler = async (event: HandlerEvent) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
+  }
 
-async function handleChatApi(request, response) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    response.statusCode = 503;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "OPENAI_API_KEY not set in .env.local" }));
-    return;
+    return { statusCode: 503, body: JSON.stringify({ error: "Service not configured. Set OPENAI_API_KEY in Netlify environment variables." }) };
   }
 
-  let body;
+  let rawMessages: unknown[];
   try {
-    body = await parseJsonBody(request);
+    const body = JSON.parse(event.body ?? "{}");
+    rawMessages = Array.isArray(body.messages) ? body.messages : [];
   } catch {
-    response.statusCode = 400;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "Invalid request body" }));
-    return;
+    return { statusCode: 400, body: JSON.stringify({ error: "Invalid request body" }) };
   }
 
-  const rawMessages = body?.messages;
-  if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
-    response.statusCode = 400;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "messages array required" }));
-    return;
+  if (rawMessages.length === 0) {
+    return { statusCode: 400, body: JSON.stringify({ error: "messages array required" }) };
   }
 
   const history = rawMessages
-    .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+    .filter((m): m is { role: string; content: string } => {
+      if (typeof m !== "object" || m === null) return false;
+      const msg = m as Record<string, unknown>;
+      return (msg.role === "user" || msg.role === "assistant") && typeof msg.content === "string";
+    })
     .slice(-MAX_HISTORY_MESSAGES)
-    .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_MESSAGE_CHARS) }));
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content.slice(0, MAX_MESSAGE_CHARS),
+    }));
 
   if (history.length === 0) {
-    response.statusCode = 400;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "No valid messages" }));
-    return;
+    return { statusCode: 400, body: JSON.stringify({ error: "No valid messages" }) };
   }
 
   const openai = new OpenAI({ apiKey });
@@ -159,76 +120,18 @@ async function handleChatApi(request, response) {
       completion.choices[0]?.message?.content?.trim() ??
       "I could not generate a response. Please try again.";
 
-    response.statusCode = 200;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ reply }));
+    // Return only the reply — conversation content is never logged (privacy)
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reply }),
+    };
   } catch (error) {
-    console.error("OpenAI API error:", error?.name ?? "unknown");
-    response.statusCode = 500;
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "The service is temporarily unavailable. Please try again shortly." }));
+    console.error("OpenAI API error:", (error as Error).name ?? "unknown");
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "The service is temporarily unavailable. Please try again shortly." }),
+    };
   }
-}
-
-const mimeTypes = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".svg": "image/svg+xml",
-  ".ico": "image/x-icon",
-  ".json": "application/json; charset=utf-8"
 };
-
-function safePath(pathname) {
-  const cleanPath = decodeURIComponent(pathname.split("?")[0]).replace(/^\/+/, "");
-  const target = resolve(dist, cleanPath);
-  return target.startsWith(dist) ? target : join(dist, "index.html");
-}
-
-async function findFile(pathname) {
-  const target = safePath(pathname === "/" ? "/index.html" : pathname);
-  if (existsSync(target) && (await stat(target)).isFile()) return target;
-  return join(dist, "index.html");
-}
-
-console.log("Building local prototype...");
-await build({ root, logLevel: "warn" });
-
-const server = createServer(async (request, response) => {
-  try {
-    // Handle AI chat API route
-    if (request.method === "POST" && request.url === "/api/chat") {
-      await handleChatApi(request, response);
-      return;
-    }
-
-    const filePath = await findFile(request.url ?? "/");
-    const extension = extname(filePath);
-    response.setHeader("Content-Type", mimeTypes[extension] ?? "application/octet-stream");
-    response.setHeader("Cache-Control", "no-store");
-
-    if (request.method === "HEAD") {
-      response.statusCode = 200;
-      response.end();
-      return;
-    }
-
-    createReadStream(filePath).pipe(response);
-  } catch {
-    response.statusCode = 500;
-    response.setHeader("Content-Type", "text/plain; charset=utf-8");
-    response.end("Local prototype server error.");
-  }
-});
-
-server.listen(port, host, async () => {
-  const html = await readFile(join(dist, "index.html"), "utf8");
-  if (!html.includes("/assets/")) {
-    console.warn("Built index did not include asset references.");
-  }
-  console.log(`Local: http://${host}:${port}/`);
-  console.log("Press Ctrl+C to stop the local prototype server.");
-});
