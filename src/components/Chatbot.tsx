@@ -47,16 +47,18 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Request failed");
+        throw new Error(data.error ?? `Server error ${response.status}`);
       }
 
       setMessages((prev) => [...prev, { role: "assistant", text: data.reply }]);
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("Chatbot error:", message);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          text: "Sorry, I could not reach the assistant right now. Please check your connection and try again.",
+          text: `Sorry, something went wrong: ${message}`,
         },
       ]);
     } finally {

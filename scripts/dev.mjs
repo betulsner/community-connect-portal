@@ -163,10 +163,12 @@ async function handleChatApi(request, response) {
     response.setHeader("Content-Type", "application/json");
     response.end(JSON.stringify({ reply }));
   } catch (error) {
-    console.error("OpenAI API error:", error?.name ?? "unknown");
+    const status = error?.status ?? error?.statusCode ?? 500;
+    const message = error?.message ?? String(error);
+    console.error("OpenAI API error:", status, message);
     response.statusCode = 500;
     response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "The service is temporarily unavailable. Please try again shortly." }));
+    response.end(JSON.stringify({ error: `OpenAI error ${status}: ${message}` }));
   }
 }
 
