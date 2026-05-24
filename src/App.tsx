@@ -6,18 +6,17 @@ import About from "./pages/About";
 import ConnectCity from "./pages/ConnectCity";
 import Dashboard from "./pages/Dashboard";
 import DigitalHelp from "./pages/DigitalHelp";
-import Events from "./pages/Events";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Refurbishment from "./pages/Refurbishment";
+import Stamps from "./pages/Stamps";
 import type { CommunityEvent, PageId, PortalSettings, PortalUser } from "./types";
 
-const pageIds: PageId[] = ["home", "connect", "digital", "refurbishment", "events", "dashboard", "about", "login"];
+const pageIds: PageId[] = ["home", "connect", "digital", "refurbishment", "stamps", "dashboard", "about", "login"];
 const remindersKey = "community-connect-reminders";
 const settingsKey = "community-connect-settings";
 const defaultSettings: PortalSettings = {
   largeText: false,
-  highContrast: false,
   language: "English"
 };
 
@@ -32,7 +31,6 @@ function settingsFromStorage(): PortalSettings {
     if (!parsed) return defaultSettings;
     return {
       largeText: Boolean(parsed.largeText),
-      highContrast: Boolean(parsed.highContrast),
       language: parsed.language && isSupportedLanguage(parsed.language) ? parsed.language : "English"
     };
   } catch {
@@ -66,6 +64,7 @@ export default function App() {
     localStorage.setItem(settingsKey, JSON.stringify(settings));
     document.documentElement.lang = settings.language.toLowerCase();
     document.documentElement.dir = settings.language === "Arabic" || settings.language === "Urdu" ? "rtl" : "ltr";
+    document.documentElement.classList.toggle("large-text", settings.largeText);
   }, [settings]);
 
   const navigate = (page: PageId) => {
@@ -78,12 +77,34 @@ export default function App() {
     setReminders((current) => (current.some((item) => item.id === event.id) ? current : [...current, event]));
   };
 
+  const handleDashboardClick = () => {
+    if (user?.mode === "demo") {
+      navigate("dashboard");
+    } else {
+      navigate("login");
+    }
+  };
+
+  const handleStampsClick = () => {
+    if (user?.mode === "demo") {
+      navigate("stamps");
+    } else {
+      navigate("login");
+    }
+  };
+
   const renderPage = () => {
-    if (activePage === "connect") return <ConnectCity />;
+    if (activePage === "connect") return <ConnectCity onAddReminder={addReminder} reminders={reminders} />;
     if (activePage === "digital") return <DigitalHelp onNavigate={navigate} />;
     if (activePage === "refurbishment") return <Refurbishment />;
-    if (activePage === "events") return <Events onNavigate={navigate} onAddReminder={addReminder} reminders={reminders} />;
-    if (activePage === "dashboard") return <Dashboard user={user} reminders={reminders} onNavigate={navigate} />;
+    if (activePage === "stamps") {
+      if (user?.mode !== "demo") { navigate("login"); return null; }
+      return <Stamps user={user} onNavigate={navigate} />;
+    }
+    if (activePage === "dashboard") {
+      if (user?.mode !== "demo") { navigate("login"); return null; }
+      return <Dashboard user={user} reminders={reminders} onNavigate={navigate} />;
+    }
     if (activePage === "about") return <About />;
     if (activePage === "login") return <Login user={user} onUserChange={setUser} onNavigate={navigate} />;
     return <Home onNavigate={navigate} />;
@@ -91,15 +112,13 @@ export default function App() {
 
   return (
     <I18nProvider language={settings.language}>
-      <div
-        className={`${settings.highContrast ? "high-contrast" : ""} ${
-          settings.largeText ? "large-text" : ""
-        } min-h-screen bg-white text-ink`}
-      >
+      <div className={`${settings.largeText ? "large-text" : ""} min-h-screen bg-white text-ink`}>
         <Navbar
           activePage={activePage}
           onNavigate={navigate}
-          onLogin={() => navigate("dashboard")}
+          onDashboard={handleDashboardClick}
+          onStamps={handleStampsClick}
+          user={user}
           settings={settings}
           onSettingsChange={setSettings}
         />

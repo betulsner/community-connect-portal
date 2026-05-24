@@ -6,11 +6,23 @@ import type { MapLocation } from "../types";
 
 const LADYWOOD_CENTER: LatLngExpression = [52.476, -1.918];
 
-interface LeafletMapProps {
-  visibleLocations: MapLocation[];
-  selectedLocation: MapLocation;
-  onSelect: (location: MapLocation) => void;
-  onMoreInfo: (location: MapLocation) => void;
+const SVG_ATTRS = 'xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"';
+
+function markerIconHtml(type: MapLocation["type"]): string {
+  switch (type) {
+    case "Community Connect Bench":
+      return `<svg ${SVG_ATTRS}><rect x="3" y="9" width="18" height="3" rx="1"/><path d="M5 12v6"/><path d="M19 12v6"/><rect x="5" y="4" width="14" height="6" rx="1"/></svg>`;
+    case "Partner Cafe":
+      return `<svg ${SVG_ATTRS}><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><line x1="6" y1="2" x2="6" y2="5"/><line x1="10" y1="2" x2="10" y2="5"/><line x1="14" y1="2" x2="14" y2="5"/></svg>`;
+    case "Refurbishment Point":
+      return `<svg ${SVG_ATTRS}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
+    case "Local Event":
+      return `<svg ${SVG_ATTRS}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+    case "Free Wi-Fi Point":
+      return `<svg ${SVG_ATTRS}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
+    default:
+      return `<svg ${SVG_ATTRS}><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`;
+  }
 }
 
 function markerClass(type: MapLocation["type"]) {
@@ -21,22 +33,13 @@ function markerClass(type: MapLocation["type"]) {
   return "gov-map-marker";
 }
 
-function markerLabel(type: MapLocation["type"]) {
-  if (type === "Community Connect Bench") return "B";
-  if (type === "Partner Cafe") return "C";
-  if (type === "Refurbishment Point") return "D";
-  if (type === "Local Event") return "E";
-  if (type === "Free Wi-Fi Point") return "W";
-  return "S";
-}
-
 function createMarkerIcon(location: MapLocation) {
   return L.divIcon({
-    html: `<span aria-hidden="true">${markerLabel(location.type)}</span>`,
+    html: markerIconHtml(location.type),
     className: markerClass(location.type),
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16]
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -18]
   });
 }
 
@@ -57,6 +60,13 @@ function MapSelectionSync({ location }: { location: MapLocation }) {
   }, [location, map]);
 
   return null;
+}
+
+interface LeafletMapProps {
+  visibleLocations: MapLocation[];
+  selectedLocation: MapLocation;
+  onSelect: (location: MapLocation) => void;
+  onMoreInfo: (location: MapLocation) => void;
 }
 
 function LeafletMap({
@@ -82,6 +92,7 @@ function LeafletMap({
       zoom={15}
       minZoom={12}
       scrollWheelZoom
+      zoomControl={true}
       className="h-full w-full"
       aria-label="Interactive map centered on Ladywood, Birmingham"
     >

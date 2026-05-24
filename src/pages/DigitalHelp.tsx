@@ -126,7 +126,7 @@ export default function DigitalHelp({ onNavigate }: DigitalHelpProps) {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <button type="button" onClick={() => onNavigate("events")} className="govuk-button flex-1 px-5 py-3">
+              <button type="button" onClick={() => onNavigate("connect")} className="govuk-button flex-1 px-5 py-3">
                 {t("common.openEvents")}
               </button>
               <button type="button" onClick={() => onNavigate("connect")} className="govuk-button govuk-button--secondary flex-1 px-5 py-3">

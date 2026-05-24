@@ -186,7 +186,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
               </button>
               <button
                 type="button"
-                onClick={() => onNavigate("events")}
+                onClick={() => onNavigate("connect")}
                 className="govuk-button govuk-button--secondary px-3 py-2 text-xs"
               >
                 {t("chat.events")}

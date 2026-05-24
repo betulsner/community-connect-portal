@@ -1,8 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SYSTEM_PROMPT = `You are City Helper, a friendly community assistant for Ladywood, Birmingham, UK.
 Your sole purpose is to help Ladywood residents find local services, events, and digital support.
+
+LANGUAGE RULE:
+Always reply in the same language the user writes in. If the user writes in Turkish, reply in Turkish. If in English, reply in English. Apply this to all responses.
 
 STRICT SCOPE RULES:
 1. Only answer questions about Ladywood community services, events, Wi-Fi, charging, digital help, refurbished devices, and local support. If someone asks about anything else, politely decline and suggest the Connect with the City map.
@@ -73,9 +76,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(503).json({ error: "Service not configured. Set OPENAI_API_KEY." });
+    return res.status(503).json({ error: "Service not configured. Set GEMINI_API_KEY." });
   }
 
   const rawMessages = req.body?.messages;
@@ -83,8 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "messages array required" });
   }
 
-  // Validate roles, cap message length, limit history depth
-  const history = rawMessages
+  const valid = rawMessages
     .filter((m: unknown) => {
       if (typeof m !== "object" || m === null) return false;
       const msg = m as Record<string, unknown>;
@@ -96,28 +98,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       content: m.content.slice(0, MAX_MESSAGE_CHARS),
     }));
 
-  if (history.length === 0) {
+  if (valid.length === 0) {
     return res.status(400).json({ error: "No valid messages" });
   }
 
-  const openai = new OpenAI({ apiKey });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: SYSTEM_PROMPT });
+
+  const history = valid.slice(0, -1).map((m: { role: string; content: string }) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+  const lastMessage = valid[valid.length - 1].content;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...history],
-      max_tokens: 200,
-      temperature: 0.3,
-    });
+    const chat = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage);
+    const reply = result.response.text().trim() || "I could not generate a response. Please try again.";
 
-    const reply =
-      completion.choices[0]?.message?.content?.trim() ??
-      "I could not generate a response. Please try again.";
-
-    // Return only the reply — do not log conversation content (privacy)
     return res.status(200).json({ reply });
   } catch (error) {
-    console.error("OpenAI API error:", (error as Error).name ?? "unknown");
+    console.error("Gemini API error:", (error as Error).name ?? "unknown");
     return res.status(500).json({ error: "The service is temporarily unavailable. Please try again shortly." });
   }
 }

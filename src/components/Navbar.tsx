@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { CalendarDays, Home, Laptop, LayoutDashboard, Map, Menu, Wrench, X } from "lucide-react";
+import { Home, Laptop, LayoutDashboard, Map, Menu, Stamp, Wrench, X } from "lucide-react";
 import { useI18n } from "../i18n";
-import type { PageId, PortalSettings } from "../types";
+import type { PageId, PortalSettings, PortalUser } from "../types";
 import AccessibilityControls from "./AccessibilityControls";
 
 interface NavbarProps {
   activePage: PageId;
   onNavigate: (page: PageId) => void;
-  onLogin: () => void;
+  onDashboard: () => void;
+  onStamps: () => void;
+  user: PortalUser | null;
   settings: PortalSettings;
   onSettingsChange: (settings: PortalSettings) => void;
   userLabel?: string;
@@ -17,14 +19,15 @@ const navItems: Array<{ id: PageId; labelKey: string; icon: React.ElementType }>
   { id: "home", labelKey: "nav.home", icon: Home },
   { id: "connect", labelKey: "nav.connect", icon: Map },
   { id: "digital", labelKey: "nav.digital", icon: Laptop },
-  { id: "refurbishment", labelKey: "nav.refurbishment", icon: Wrench },
-  { id: "events", labelKey: "nav.events", icon: CalendarDays }
+  { id: "refurbishment", labelKey: "nav.refurbishment", icon: Wrench }
 ];
 
 export default function Navbar({
   activePage,
   onNavigate,
-  onLogin,
+  onDashboard,
+  onStamps,
+  user,
   settings,
   onSettingsChange,
   userLabel
@@ -70,19 +73,42 @@ export default function Navbar({
               </button>
             );
           })}
+          {user?.mode === "demo" && (
+            <button
+              type="button"
+              onClick={onStamps}
+              className={`site-nav__link ${activePage === "stamps" ? "site-nav__link--active" : ""}`}
+              aria-current={activePage === "stamps" ? "page" : undefined}
+            >
+              My Stamps
+            </button>
+          )}
         </div>
 
         <div className="site-header__actions">
           <div className="site-header__access">
             <AccessibilityControls settings={settings} onChange={onSettingsChange} />
           </div>
+          {user?.mode === "demo" && (
+            <button
+              type="button"
+              onClick={onStamps}
+              className="govuk-button govuk-button--secondary site-dashboard-button"
+              aria-label="My stamps"
+            >
+              <Stamp size={16} aria-hidden="true" />
+              <span className="site-dashboard-button__text">Stamps</span>
+            </button>
+          )}
           <button
             type="button"
-            onClick={onLogin}
+            onClick={onDashboard}
             className="govuk-button site-dashboard-button"
           >
             <LayoutDashboard size={16} aria-hidden="true" />
-            <span className="site-dashboard-button__text">{userLabel ?? t("nav.dashboard")}</span>
+            <span className="site-dashboard-button__text">
+              {user?.mode === "demo" ? (userLabel ?? t("nav.dashboard")) : t("nav.login") ?? "Log in"}
+            </span>
           </button>
           <button
             type="button"
@@ -119,16 +145,22 @@ export default function Navbar({
             </button>
           );
         })}
+        {user?.mode === "demo" && (
+          <button
+            type="button"
+            onClick={() => { onStamps(); setIsOpen(false); }}
+            className={`site-mobile-menu__link ${activePage === "stamps" ? "site-mobile-menu__link--active" : ""}`}
+          >
+            My Stamps
+          </button>
+        )}
         <button
           type="button"
-          onClick={() => {
-            onLogin();
-            setIsOpen(false);
-          }}
+          onClick={() => { onDashboard(); setIsOpen(false); }}
           className="govuk-button mt-2 w-full px-4 py-3"
         >
           <LayoutDashboard size={16} aria-hidden="true" />
-          {userLabel ?? t("nav.dashboard")}
+          {user?.mode === "demo" ? (userLabel ?? t("nav.dashboard")) : "Log in"}
         </button>
       </div>
     </header>

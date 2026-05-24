@@ -1,8 +1,9 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { BatteryCharging, CalendarDays, Check, Hand, Route, Wrench, Wifi } from "lucide-react";
+import { BatteryCharging, Bell, BellOff, CalendarDays, Check, Clock, Hand, MapPin, Route, Wrench, Wifi } from "lucide-react";
+import { events } from "../data/events";
 import { locations } from "../data/locations";
 import { useI18n } from "../i18n";
-import type { LocationTag, MapLocation } from "../types";
+import type { CommunityEvent, LocationTag, MapLocation } from "../types";
 import LocationCard from "./LocationCard";
 import Modal from "./Modal";
 
@@ -18,6 +19,17 @@ const filters: Array<{ tag: LocationTag; labelKey: string; icon: React.ElementTy
   { tag: "open-today", labelKey: "connect.filter.open", icon: Route }
 ];
 
+const categoryColour: Record<string, string> = {
+  "Digital help": "bg-lagoon-50 text-lagoon-700",
+  "Digital skills": "bg-lagoon-50 text-lagoon-700",
+  "Jobs": "bg-sun-100 text-ink",
+  "Connection": "bg-green-50 text-green-800",
+  "Community": "bg-green-50 text-green-800",
+  "Device support": "bg-red-50 text-red-800",
+  "Volunteering": "bg-purple-50 text-purple-800",
+  "Language support": "bg-orange-50 text-orange-800"
+};
+
 function googleDirectionsUrl(location: MapLocation) {
   const destination = location.coordinatesLatLng
     ? `${location.coordinatesLatLng.lat},${location.coordinatesLatLng.lng}`
@@ -25,7 +37,12 @@ function googleDirectionsUrl(location: MapLocation) {
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
 }
 
-export default function MapSection() {
+interface MapSectionProps {
+  onAddReminder: (event: CommunityEvent) => void;
+  reminders: CommunityEvent[];
+}
+
+export default function MapSection({ onAddReminder, reminders }: MapSectionProps) {
   const { t } = useI18n();
   const allLocations = useMemo(() => locations, []);
   const [activeFilters, setActiveFilters] = useState<LocationTag[]>([]);
@@ -33,6 +50,7 @@ export default function MapSection() {
   const [selectedId, setSelectedId] = useState(allLocations[0].id);
   const [notice, setNotice] = useState("");
   const [detailsLocation, setDetailsLocation] = useState<MapLocation | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CommunityEvent | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedFilters(activeFilters), 150);
@@ -83,6 +101,8 @@ export default function MapSection() {
     },
     []
   );
+
+  const hasReminder = (event: CommunityEvent) => reminders.some((r) => r.id === event.id);
 
   return (
     <section className="bg-white py-12">
@@ -157,8 +177,66 @@ export default function MapSection() {
             />
           ))}
         </div>
+
+        {/* Events section */}
+        <div className="mt-12">
+          <div className="mb-6">
+            <h2 className="text-3xl font-black text-ink">Upcoming Events</h2>
+            <p className="mt-2 text-lg text-slate-700">Free community events in Ladywood this month. Save a reminder to your dashboard.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {events.map((event) => {
+              const saved = hasReminder(event);
+              const colourClass = categoryColour[event.category] ?? "bg-slate-100 text-slate-700";
+              return (
+                <article key={event.id} className="govuk-panel flex flex-col p-5">
+                  <span className={`inline-block self-start px-2 py-1 text-xs font-bold ${colourClass}`}>
+                    {event.category}
+                  </span>
+                  <h3 className="mt-3 text-lg font-black text-ink">{event.name}</h3>
+                  <p className="mt-1 flex items-center gap-1 text-sm font-bold text-slate-700">
+                    <CalendarDays size={14} aria-hidden="true" />
+                    {event.dateTime}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-sm font-bold text-slate-700">
+                    <MapPin size={14} aria-hidden="true" />
+                    {event.location}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-sm font-bold text-green-700">
+                    <Clock size={14} aria-hidden="true" />
+                    {event.price}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700">{event.summary}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedEvent(event)}
+                      className="govuk-button govuk-button--secondary px-4 py-2 text-sm"
+                    >
+                      More info
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { if (!saved) onAddReminder(event); }}
+                      disabled={saved}
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 ${
+                        saved
+                          ? "border-green-600 bg-green-50 text-green-700"
+                          : "govuk-button"
+                      }`}
+                    >
+                      {saved ? <BellOff size={14} aria-hidden="true" /> : <Bell size={14} aria-hidden="true" />}
+                      {saved ? "Reminder saved" : "Add reminder"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
+      {/* Location details modal */}
       {detailsLocation && (
         <Modal labelledBy="location-details-title" onClose={() => setDetailsLocation(null)}>
           <div className="flex items-start justify-between gap-4">
@@ -196,35 +274,84 @@ export default function MapSection() {
 
           <div className="mt-5 flex flex-wrap gap-4 text-lg font-bold">
             {detailsLocation.socialLinks?.instagram && (
-              <a href={detailsLocation.socialLinks.instagram} target="_blank" rel="noreferrer">
-                Instagram
-              </a>
+              <a href={detailsLocation.socialLinks.instagram} target="_blank" rel="noreferrer">Instagram</a>
             )}
             {detailsLocation.socialLinks?.facebook && (
-              <a href={detailsLocation.socialLinks.facebook} target="_blank" rel="noreferrer">
-                Facebook
-              </a>
+              <a href={detailsLocation.socialLinks.facebook} target="_blank" rel="noreferrer">Facebook</a>
             )}
             {detailsLocation.socialLinks?.website && (
-              <a href={detailsLocation.socialLinks.website} target="_blank" rel="noreferrer">
-                Website
-              </a>
+              <a href={detailsLocation.socialLinks.website} target="_blank" rel="noreferrer">Website</a>
             )}
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={() => {
-                setSelectedId(detailsLocation.id);
-                setDetailsLocation(null);
-              }}
+              onClick={() => { setSelectedId(detailsLocation.id); setDetailsLocation(null); }}
               className="govuk-button govuk-button--secondary flex-1 px-5 py-3"
             >
               {t("common.showMap")}
             </button>
             <button type="button" onClick={() => handleDirections(detailsLocation)} className="govuk-button flex-1 px-5 py-3">
               {t("common.getDirections")}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Event details modal */}
+      {selectedEvent && (
+        <Modal labelledBy="event-details-title" onClose={() => setSelectedEvent(null)}>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <span className={`inline-block px-2 py-1 text-xs font-bold ${categoryColour[selectedEvent.category] ?? "bg-slate-100 text-slate-700"}`}>
+                {selectedEvent.category}
+              </span>
+              <h2 id="event-details-title" className="mt-2 text-3xl font-black">
+                {selectedEvent.name}
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedEvent(null)}
+              className="min-h-11 border-2 border-ink bg-white px-4 py-2 text-lg font-bold"
+            >
+              {t("common.close")}
+            </button>
+          </div>
+
+          <dl className="mt-5 grid gap-4 text-lg">
+            <InfoRow label="Date and time" value={selectedEvent.dateTime} />
+            <InfoRow label="Location" value={selectedEvent.location} />
+            <InfoRow label="Cost" value={selectedEvent.price} />
+            <InfoRow label="Who is this for" value={selectedEvent.audience} />
+            <InfoRow label="Help offered" value={selectedEvent.helpOffered} />
+            <InfoRow label="Accessibility" value={selectedEvent.accessibility} />
+            {selectedEvent.contact && <InfoRow label="Contact" value={selectedEvent.contact} />}
+          </dl>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            {hasReminder(selectedEvent) ? (
+              <div className="flex items-center gap-2 font-bold text-green-700">
+                <BellOff size={18} aria-hidden="true" />
+                Reminder already saved
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => { onAddReminder(selectedEvent); setSelectedEvent(null); }}
+                className="govuk-button flex-1 px-5 py-3"
+              >
+                <Bell size={16} aria-hidden="true" />
+                Add reminder
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setSelectedEvent(null)}
+              className="govuk-button govuk-button--secondary flex-1 px-5 py-3"
+            >
+              {t("common.close")}
             </button>
           </div>
         </Modal>

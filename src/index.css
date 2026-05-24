@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html.large-text {
+    font-size: 18px;
+  }
+
   :root {
     color: #0b0c0c;
     background: #ffffff;
@@ -422,9 +426,7 @@
     z-index: 0;
   }
 
-  .leaflet-pane,
-  .leaflet-top,
-  .leaflet-bottom {
+  .leaflet-pane {
     z-index: 1 !important;
   }
 
@@ -506,29 +508,6 @@
 
   .scrollbar-none::-webkit-scrollbar {
     display: none;
-  }
-
-  .large-text {
-    font-size: 18px;
-  }
-
-  .high-contrast {
-    background: #ffffff;
-    color: #000000;
-  }
-
-  .high-contrast .hc-panel {
-    border-color: #000000 !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  .high-contrast .hc-panel * {
-    color: #000000 !important;
-  }
-
-  .high-contrast button {
-    border-color: #000000;
   }
 
   .rounded,

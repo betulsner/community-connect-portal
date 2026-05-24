@@ -35,7 +35,7 @@ export default function Dashboard({ user, reminders, onNavigate }: DashboardProp
             {reminders.length === 0 ? (
               <div className="mt-4">
                 <p className="text-lg text-ink">{t("dashboard.noReminders")}</p>
-                <button type="button" onClick={() => onNavigate("events")} className="govuk-button mt-4 px-5 py-3">
+                <button type="button" onClick={() => onNavigate("connect")} className="govuk-button mt-4 px-5 py-3">
                   {t("dashboard.findEvents")}
                 </button>
               </div>
@@ -96,10 +96,16 @@ export default function Dashboard({ user, reminders, onNavigate }: DashboardProp
           </section>
         </div>
 
-        <button type="button" onClick={() => onNavigate("login")} className="govuk-link-button mt-8 inline-flex items-center gap-2 text-lg">
-          <User size={20} aria-hidden="true" />
-          {t("dashboard.changeUser")}
-        </button>
+        <div className="mt-8 flex flex-wrap gap-4">
+          <button type="button" onClick={() => onNavigate("stamps")} className="govuk-button govuk-button--secondary px-5 py-3">
+            <Trophy size={16} aria-hidden="true" />
+            View my stamps
+          </button>
+          <button type="button" onClick={() => onNavigate("login")} className="govuk-link-button inline-flex items-center gap-2 text-lg">
+            <User size={20} aria-hidden="true" />
+            {t("dashboard.changeUser")}
+          </button>
+        </div>
       </div>
     </section>
   );

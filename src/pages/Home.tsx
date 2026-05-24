@@ -18,7 +18,7 @@ const cards: Array<{ titleKey: string; textKey: string; buttonKey: string; page:
     titleKey: "home.card.events.title",
     textKey: "home.card.events.text",
     buttonKey: "common.viewDetails",
-    page: "events",
+    page: "connect",
     icon: CalendarDays
   },
   {

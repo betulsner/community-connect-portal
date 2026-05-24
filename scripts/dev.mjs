@@ -3,7 +3,7 @@ import { createReadStream, existsSync, readFileSync } from "node:fs";
 import { stat, readFile } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
 import { build } from "vite";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const host = "127.0.0.1";
 const port = Number(process.env.PORT ?? 5173);
@@ -22,10 +22,17 @@ if (existsSync(envPath)) {
     const value = trimmed.slice(eqIndex + 1).trim().replace(/^["']|["']$/g, "");
     if (key) process.env[key] = value;
   }
+  const loaded = process.env.GEMINI_API_KEY;
+  console.log("GEMINI_API_KEY loaded:", loaded ? `AIza...${loaded.slice(-6)}` : "NOT FOUND");
+} else {
+  console.warn("No .env.local file found — chatbot will not work.");
 }
 
 const SYSTEM_PROMPT = `You are City Helper, a friendly community assistant for Ladywood, Birmingham, UK.
 Your sole purpose is to help Ladywood residents find local services, events, and digital support.
+
+LANGUAGE RULE:
+Always reply in the same language the user writes in. If the user writes in Turkish, reply in Turkish. If in English, reply in English. Apply this to all responses.
 
 STRICT SCOPE RULES:
 1. Only answer questions about Ladywood community services, events, Wi-Fi, charging, digital help, refurbished devices, and local support. If someone asks about anything else, politely decline and suggest the Connect with the City map.
@@ -107,11 +114,11 @@ async function parseJsonBody(request) {
 }
 
 async function handleChatApi(request, response) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     response.statusCode = 503;
     response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: "OPENAI_API_KEY not set in .env.local" }));
+    response.end(JSON.stringify({ error: "GEMINI_API_KEY not set in .env.local" }));
     return;
   }
 
@@ -133,42 +140,42 @@ async function handleChatApi(request, response) {
     return;
   }
 
-  const history = rawMessages
+  const valid = rawMessages
     .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
     .slice(-MAX_HISTORY_MESSAGES)
     .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_MESSAGE_CHARS) }));
 
-  if (history.length === 0) {
+  if (valid.length === 0) {
     response.statusCode = 400;
     response.setHeader("Content-Type", "application/json");
     response.end(JSON.stringify({ error: "No valid messages" }));
     return;
   }
 
-  const openai = new OpenAI({ apiKey });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: SYSTEM_PROMPT });
+
+  // Gemini uses "model" role instead of "assistant"
+  const history = valid.slice(0, -1).map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+  const lastMessage = valid[valid.length - 1].content;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...history],
-      max_tokens: 200,
-      temperature: 0.3,
-    });
-
-    const reply =
-      completion.choices[0]?.message?.content?.trim() ??
-      "I could not generate a response. Please try again.";
+    const chat = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage);
+    const reply = result.response.text().trim() || "I could not generate a response. Please try again.";
 
     response.statusCode = 200;
     response.setHeader("Content-Type", "application/json");
     response.end(JSON.stringify({ reply }));
   } catch (error) {
-    const status = error?.status ?? error?.statusCode ?? 500;
-    const message = error?.message ?? String(error);
-    console.error("OpenAI API error:", status, message);
+    const msg = error?.message ?? String(error);
+    console.error("Gemini API error:", msg);
     response.statusCode = 500;
     response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify({ error: `OpenAI error ${status}: ${message}` }));
+    response.end(JSON.stringify({ error: `Gemini error: ${msg}` }));
   }
 }
 

@@ -1,4 +1,4 @@
-import { Contrast, Languages, Type } from "lucide-react";
+import { Languages, Type } from "lucide-react";
 import { supportedLanguages, useI18n } from "../i18n";
 import type { PortalSettings } from "../types";
 
@@ -48,19 +48,6 @@ export default function AccessibilityControls({ settings, onChange }: Accessibil
             aria-label={t("access.largeText")}
           >
             A+
-          </button>
-        </div>
-        <div className="flex items-center">
-          <button
-            type="button"
-            onClick={() => update({ highContrast: !settings.highContrast })}
-            className={`cc-accessibility-button cc-accessibility-button--contrast ${
-              settings.highContrast ? "cc-accessibility-button--active" : ""
-            }`}
-            aria-pressed={settings.highContrast}
-          >
-            <Contrast size={18} aria-hidden="true" />
-            <span>{t("access.highContrast")}</span>
           </button>
         </div>
       </div>

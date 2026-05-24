@@ -1,4 +1,4 @@
-export type PageId = "home" | "connect" | "digital" | "refurbishment" | "events" | "dashboard" | "about" | "login";
+export type PageId = "home" | "connect" | "digital" | "refurbishment" | "stamps" | "dashboard" | "about" | "login";
 
 export type LocationTag =
   | "wifi"
@@ -106,7 +106,6 @@ export interface Reward {
 
 export interface PortalSettings {
   largeText: boolean;
-  highContrast: boolean;
   language: string;
 }
 

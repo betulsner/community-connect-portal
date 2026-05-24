@@ -1,8 +1,11 @@
 import type { Handler, HandlerEvent } from "@netlify/functions";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SYSTEM_PROMPT = `You are City Helper, a friendly community assistant for Ladywood, Birmingham, UK.
 Your sole purpose is to help Ladywood residents find local services, events, and digital support.
+
+LANGUAGE RULE:
+Always reply in the same language the user writes in. If the user writes in Turkish, reply in Turkish. If in English, reply in English. Apply this to all responses.
 
 STRICT SCOPE RULES:
 1. Only answer questions about Ladywood community services, events, Wi-Fi, charging, digital help, refurbished devices, and local support. If someone asks about anything else, politely decline and suggest the Connect with the City map.
@@ -73,9 +76,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return { statusCode: 503, body: JSON.stringify({ error: "Service not configured. Set OPENAI_API_KEY in Netlify environment variables." }) };
+    return { statusCode: 503, body: JSON.stringify({ error: "Service not configured. Set GEMINI_API_KEY in Netlify environment variables." }) };
   }
 
   let rawMessages: unknown[];
@@ -90,7 +93,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     return { statusCode: 400, body: JSON.stringify({ error: "messages array required" }) };
   }
 
-  const history = rawMessages
+  const valid = rawMessages
     .filter((m): m is { role: string; content: string } => {
       if (typeof m !== "object" || m === null) return false;
       const msg = m as Record<string, unknown>;
@@ -102,32 +105,31 @@ export const handler: Handler = async (event: HandlerEvent) => {
       content: m.content.slice(0, MAX_MESSAGE_CHARS),
     }));
 
-  if (history.length === 0) {
+  if (valid.length === 0) {
     return { statusCode: 400, body: JSON.stringify({ error: "No valid messages" }) };
   }
 
-  const openai = new OpenAI({ apiKey });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: SYSTEM_PROMPT });
+
+  const history = valid.slice(0, -1).map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+  const lastMessage = valid[valid.length - 1].content;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...history],
-      max_tokens: 200,
-      temperature: 0.3,
-    });
+    const chat = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage);
+    const reply = result.response.text().trim() || "I could not generate a response. Please try again.";
 
-    const reply =
-      completion.choices[0]?.message?.content?.trim() ??
-      "I could not generate a response. Please try again.";
-
-    // Return only the reply — conversation content is never logged (privacy)
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reply }),
     };
   } catch (error) {
-    console.error("OpenAI API error:", (error as Error).name ?? "unknown");
+    console.error("Gemini API error:", (error as Error).name ?? "unknown");
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
