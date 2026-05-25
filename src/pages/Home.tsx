@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, Laptop, MapPin, UserCircle, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, Gift, HandHeart, Laptop, MapPin, Signal, UserCircle, Users } from "lucide-react";
 import { useI18n } from "../i18n";
 import type { PageId } from "../types";
 
@@ -34,6 +34,27 @@ const cards: Array<{ titleKey: string; textKey: string; buttonKey: string; page:
     buttonKey: "common.openDashboard",
     page: "dashboard",
     icon: UserCircle
+  },
+  {
+    titleKey: "home.card.donate.title",
+    textKey: "home.card.donate.text",
+    buttonKey: "common.viewDetails",
+    page: "donate",
+    icon: Gift
+  },
+  {
+    titleKey: "home.card.volunteer.title",
+    textKey: "home.card.volunteer.text",
+    buttonKey: "common.viewDetails",
+    page: "volunteer",
+    icon: HandHeart
+  },
+  {
+    titleKey: "home.card.accessData.title",
+    textKey: "home.card.accessData.text",
+    buttonKey: "common.viewDetails",
+    page: "access-data",
+    icon: Signal
   }
 ];
 
@@ -82,7 +103,7 @@ export default function Home({ onNavigate }: HomeProps) {
             {t("home.needTitle")}
           </h2>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {cards.map((card) => {
               const Icon = card.icon;
               return (

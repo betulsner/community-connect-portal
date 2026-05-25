@@ -40,7 +40,7 @@ export const locations: MapLocation[] = [
     cost: "Free",
     contact: "Ask for the digital inclusion worker at reception.",
     socialLinks: { website: "https://www.birmingham.gov.uk/" },
-    tags: ["wifi", "digital-help", "accessible", "open-today"],
+    tags: ["wifi", "digital-help", "stamps-offered", "accessible", "open-today"],
     coordinates: { x: 34, y: 42 }
   },
   {
@@ -61,7 +61,7 @@ export const locations: MapLocation[] = [
     cost: "Free support; printing may cost a small amount",
     contact: "Speak to the library help desk.",
     socialLinks: { website: "https://www.birmingham.gov.uk/libraries" },
-    tags: ["wifi", "digital-help", "accessible", "open-today"],
+    tags: ["wifi", "digital-help", "stamps-offered", "accessible", "open-today"],
     coordinates: { x: 63, y: 37 }
   },
   {
@@ -82,7 +82,7 @@ export const locations: MapLocation[] = [
     cost: "Free Wi-Fi; drinks optional",
     contact: "Ask cafe staff about digital help hours.",
     socialLinks: { instagram: "https://www.instagram.com/", facebook: "https://www.facebook.com/" },
-    tags: ["wifi", "charging", "digital-help", "accessible", "open-today"],
+    tags: ["wifi", "charging", "digital-help", "stamps-offered", "accessible", "open-today"],
     coordinates: { x: 54, y: 66 }
   },
   {
@@ -103,7 +103,7 @@ export const locations: MapLocation[] = [
     cost: "Free checks; low-cost repairs",
     contact: "Walk in during opening hours.",
     socialLinks: { website: "https://www.birmingham.gov.uk/" },
-    tags: ["refurbished-devices", "digital-help", "accessible", "open-today"],
+    tags: ["refurbished-devices", "digital-help", "stamps-offered", "accessible", "open-today"],
     coordinates: { x: 73, y: 61 }
   },
   {
@@ -143,7 +143,7 @@ export const locations: MapLocation[] = [
     whoFor: "Residents who want a friendly chat or help finding local support.",
     cost: "Free",
     contact: "Ask at Canal Side Community Room.",
-    tags: ["wifi", "events", "digital-help", "accessible", "open-today"],
+    tags: ["wifi", "events", "digital-help", "stamps-offered", "accessible", "open-today"],
     coordinates: { x: 42, y: 30 }
   },
   {

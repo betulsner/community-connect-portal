@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { Mail, MapPinned, Phone, Send, ShieldCheck, Users, Wifi } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPinned, Phone, Send, ShieldCheck, Twitter, Users, Wifi } from "lucide-react";
 import { useI18n } from "../i18n";
+import type { PageId } from "../types";
+
+interface AboutProps {
+  onNavigate: (page: PageId) => void;
+}
 
 const team = [
   {
@@ -29,7 +34,7 @@ const team = [
   }
 ];
 
-export default function About() {
+export default function About({ onNavigate }: AboutProps) {
   const { t } = useI18n();
   const [submitted, setSubmitted] = useState(false);
 
@@ -114,6 +119,24 @@ export default function About() {
               </div>
             </div>
             <p className="mt-5 text-sm text-slate-600">Office hours: Monday–Friday, 09:00–17:00. We aim to reply within 2 working days.</p>
+            <div className="mt-5 flex items-center gap-4">
+              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-bold text-lagoon-700">
+                <Instagram size={16} aria-hidden="true" /> @ConnectedLadywood
+              </a>
+              <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-bold text-lagoon-700">
+                <Facebook size={16} aria-hidden="true" /> Connected Ladywood
+              </a>
+              <a href="https://www.twitter.com/" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-bold text-lagoon-700">
+                <Twitter size={16} aria-hidden="true" /> @ConnectLadywood
+              </a>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate("volunteer")}
+              className="govuk-button govuk-button--secondary mt-5 px-5 py-3"
+            >
+              Volunteer with us
+            </button>
           </div>
 
           <div className="hc-panel govuk-panel bg-lagoon-50 p-6">

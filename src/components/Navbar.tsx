@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, Laptop, LayoutDashboard, Map, Menu, Stamp, Wrench, X } from "lucide-react";
+import { Home, Info, Laptop, LayoutDashboard, Map, Menu, Signal, Stamp, Wrench, X } from "lucide-react";
 import { useI18n } from "../i18n";
 import type { PageId, PortalSettings, PortalUser } from "../types";
 import AccessibilityControls from "./AccessibilityControls";
@@ -19,7 +19,9 @@ const navItems: Array<{ id: PageId; labelKey: string; icon: React.ElementType }>
   { id: "home", labelKey: "nav.home", icon: Home },
   { id: "connect", labelKey: "nav.connect", icon: Map },
   { id: "digital", labelKey: "nav.digital", icon: Laptop },
-  { id: "refurbishment", labelKey: "nav.refurbishment", icon: Wrench }
+  { id: "refurbishment", labelKey: "nav.refurbishment", icon: Wrench },
+  { id: "access-data", labelKey: "nav.accessData", icon: Signal },
+  { id: "about", labelKey: "nav.about", icon: Info }
 ];
 
 export default function Navbar({

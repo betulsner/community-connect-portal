@@ -5,6 +5,6 @@ export const mockUser: MockUserProfile = {
   hasRefurbishedDevice: true,
   deviceType: "Refurbished laptop",
   deviceReceivedDate: "2026-05-19",
-  rewardPoints: 70,
+  stamps: 70,
   digitalHelpProgress: "Email basics complete"
 };

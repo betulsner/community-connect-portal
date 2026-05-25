@@ -13,7 +13,9 @@ export const events: CommunityEvent[] = [
     helpOffered: "Email, forms, NHS app, passwords, and basic phone help.",
     accessibility: "Level entrance, seating, accessible toilet, and quiet support slots.",
     locationId: "ladywood-health-centre",
-    contact: "Ask for the digital inclusion worker."
+    contact: "Ask for the digital inclusion worker.",
+    stampsOffered: true,
+    themes: ["phones", "email", "NHS app", "forms"]
   },
   {
     id: "cv-help-hour",
@@ -27,7 +29,9 @@ export const events: CommunityEvent[] = [
     helpOffered: "CVs, job searches, email attachments, and online applications.",
     accessibility: "Ramp access, seating, and large-print forms available.",
     locationId: "spring-hill-library",
-    contact: "Speak to the library help desk."
+    contact: "Speak to the library help desk.",
+    stampsOffered: true,
+    themes: ["jobs", "CV", "online applications"]
   },
   {
     id: "community-cafe-meetup",
@@ -41,7 +45,9 @@ export const events: CommunityEvent[] = [
     helpOffered: "Friendly welcome, local signposting, and coffee rewards.",
     accessibility: "Wide doorway, seating near sockets, and staff support.",
     locationId: "bridge-cafe",
-    contact: "Speak to cafe staff."
+    contact: "Speak to cafe staff.",
+    stampsOffered: true,
+    themes: ["social", "community", "connection"]
   },
   {
     id: "beginner-computer-session",
@@ -55,7 +61,9 @@ export const events: CommunityEvent[] = [
     helpOffered: "Mouse, keyboard, search, email basics, and online safety.",
     accessibility: "Ramp access, seating, and staff nearby.",
     locationId: "spring-hill-library",
-    contact: "Speak to the library help desk."
+    contact: "Speak to the library help desk.",
+    stampsOffered: true,
+    themes: ["beginners", "computers", "online safety"]
   },
   {
     id: "repair-refurb-event",
@@ -69,7 +77,9 @@ export const events: CommunityEvent[] = [
     helpOffered: "Phone checks, laptop checks, setup help, and repair advice.",
     accessibility: "Ground-floor workshop with seating and appointment support.",
     locationId: "rework-ladywood",
-    contact: "Walk in during event hours."
+    contact: "Walk in during event hours.",
+    stampsOffered: true,
+    themes: ["devices", "repair", "laptops", "phones"]
   },
   {
     id: "coffee-connection",
@@ -83,7 +93,9 @@ export const events: CommunityEvent[] = [
     helpOffered: "Community introductions and support signposting.",
     accessibility: "Step-free access and quiet table available.",
     locationId: "coffee-connect-event",
-    contact: "Ask at Canal Side Community Room."
+    contact: "Ask at Canal Side Community Room.",
+    stampsOffered: true,
+    themes: ["social", "community", "wellbeing"]
   },
   {
     id: "volunteer-tech-buddy",
@@ -97,7 +109,8 @@ export const events: CommunityEvent[] = [
     helpOffered: "Volunteer induction and buddy session information.",
     accessibility: "Seating available; accessibility information can be checked before attending.",
     locationId: "ladywood-health-centre",
-    contact: "Ask for the volunteer coordinator."
+    contact: "Ask for the volunteer coordinator.",
+    themes: ["volunteering", "digital champions"]
   },
   {
     id: "language-support",
@@ -111,6 +124,60 @@ export const events: CommunityEvent[] = [
     helpOffered: "Forms, online services, and signposting in community languages.",
     accessibility: "Step-free access; translation support by request.",
     locationId: "summerfield-park-wifi",
-    contact: "Ask at Summerfield Community Centre."
+    contact: "Ask at Summerfield Community Centre.",
+    stampsOffered: true,
+    themes: ["languages", "forms", "translation"]
+  },
+  {
+    id: "age-uk-digital-drop-in",
+    name: "Age UK Digital Drop-in",
+    dateTime: "Tuesday, 27 May, 10:00-12:00",
+    location: "Woodlands Park Hall, Ladywood",
+    price: "Free",
+    audience: "Adults aged 50+ who want help with smartphones and tablets",
+    category: "Digital help",
+    summary: "Friendly one-to-one help with phones, tablets, video calls, and online safety.",
+    helpOffered: "Video calls, WhatsApp, online banking basics, and staying safe online.",
+    accessibility: "Step-free access, seating throughout, and accessible toilets.",
+    locationId: "ladywood-health-centre",
+    contact: "Contact Age UK Birmingham: 0121 437 0033",
+    stampsOffered: true,
+    themes: ["older adults", "smartphones", "video calls", "online safety"],
+    sourceNote: "Age UK Birmingham"
+  },
+  {
+    id: "age-uk-tablet-skills",
+    name: "Tablet Skills for Life",
+    dateTime: "Thursday, 29 May, 13:30-15:30",
+    location: "Oscott Community Centre, Ladywood",
+    price: "Free",
+    audience: "Older adults wanting to use a tablet for everyday tasks",
+    category: "Digital skills",
+    summary: "Learn to use a tablet to shop online, book GP appointments, and connect with family.",
+    helpOffered: "Online shopping, NHS App, video calls, and managing accounts.",
+    accessibility: "Fully accessible venue; hearing loop available on request.",
+    locationId: "spring-hill-library",
+    contact: "Contact Age UK Birmingham: 0121 437 0033",
+    stampsOffered: true,
+    themes: ["older adults", "tablets", "NHS app", "shopping online"],
+    sourceNote: "Age UK Birmingham"
+  },
+  {
+    id: "age-uk-befriending-digital",
+    name: "Befriending and Digital Confidence",
+    dateTime: "Friday, 30 May, 10:00-11:30",
+    location: "William Lench Court, Ladywood",
+    price: "Free",
+    audience: "Older adults who feel isolated or lack confidence online",
+    category: "Connection",
+    summary: "A welcoming session combining digital skills with social connection and peer support.",
+    helpOffered: "One-to-one coaching, online safety, and introductions to local clubs and activities.",
+    accessibility: "Accessible building with lift access and hearing loop.",
+    locationId: "ladywood-health-centre",
+    contact: "Contact Age UK Birmingham: 0121 437 0033",
+    stampsOffered: true,
+    themes: ["older adults", "social isolation", "digital confidence", "peer support"],
+    sourceNote: "Age UK Birmingham",
+    transportNote: "Free community transport available — call Age UK Birmingham to arrange."
   }
 ];

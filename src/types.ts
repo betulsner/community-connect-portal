@@ -1,4 +1,17 @@
-export type PageId = "home" | "connect" | "digital" | "refurbishment" | "stamps" | "dashboard" | "about" | "login";
+export type PageId =
+  | "home"
+  | "connect"
+  | "digital"
+  | "refurbishment"
+  | "stamps"
+  | "dashboard"
+  | "about"
+  | "login"
+  | "volunteer"
+  | "donate"
+  | "free-sim"
+  | "affordable-internet"
+  | "access-data";
 
 export type LocationTag =
   | "wifi"
@@ -6,6 +19,7 @@ export type LocationTag =
   | "digital-help"
   | "refurbished-devices"
   | "events"
+  | "stamps-offered"
   | "accessible"
   | "open-today";
 
@@ -84,6 +98,10 @@ export interface CommunityEvent {
   helpOffered: string;
   locationId?: string;
   contact?: string;
+  stampsOffered?: boolean;
+  themes?: string[];
+  transportNote?: string;
+  sourceNote?: string;
 }
 
 export interface Partner {
@@ -119,6 +137,6 @@ export interface MockUserProfile {
   hasRefurbishedDevice: boolean;
   deviceType: string;
   deviceReceivedDate: string;
-  rewardPoints: number;
+  stamps: number;
   digitalHelpProgress: string;
 }

@@ -89,7 +89,7 @@ export default function Dashboard({ user, reminders, onNavigate }: DashboardProp
               {t("dashboard.progress")}
             </h2>
             <p className="mt-4 text-lg text-ink">{mockUser.digitalHelpProgress}</p>
-            <p className="mt-2 text-lg text-ink">{mockUser.rewardPoints} {t("dashboard.rewardPoints")}</p>
+            <p className="mt-2 text-lg text-ink">{mockUser.stamps} {t("dashboard.rewardPoints")}</p>
             <button type="button" onClick={() => onNavigate("digital")} className="govuk-button govuk-button--secondary mt-4 px-5 py-3">
               {t("dashboard.findDigital")}
             </button>

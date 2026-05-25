@@ -47,7 +47,7 @@ const locationRewards = [
 ];
 
 export default function Stamps({ user, onNavigate }: StampsProps) {
-  const points = mockUser.rewardPoints;
+  const points = mockUser.stamps;
   const maxPoints = Math.max(...rewards.map((r) => r.points));
 
   return (
@@ -69,7 +69,7 @@ export default function Stamps({ user, onNavigate }: StampsProps) {
           <div className="govuk-panel bg-lagoon-50 p-6 text-center">
             <Stamp size={32} className="mx-auto text-lagoon-700" aria-hidden="true" />
             <p className="mt-3 text-5xl font-black text-ink">{points}</p>
-            <p className="mt-1 font-bold text-slate-700">points collected</p>
+            <p className="mt-1 font-bold text-slate-700">stamps collected</p>
           </div>
           <div className="govuk-panel p-6 text-center">
             <Trophy size={32} className="mx-auto text-lagoon-700" aria-hidden="true" />
@@ -104,7 +104,7 @@ export default function Stamps({ user, onNavigate }: StampsProps) {
                     aria-hidden="true"
                   />
                   <h3 className="mt-3 text-lg font-black text-ink">{reward.title}</h3>
-                  <p className="mt-1 text-sm font-bold text-slate-600">{reward.points} points needed</p>
+                  <p className="mt-1 text-sm font-bold text-slate-600">{reward.points} stamps needed</p>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">{reward.description}</p>
                   <div className="mt-4">
                     {unlocked ? (
@@ -120,7 +120,7 @@ export default function Stamps({ user, onNavigate }: StampsProps) {
                           />
                         </div>
                         <p className="mt-1 text-xs text-slate-500">
-                          {reward.points - points} more points needed
+                          {reward.points - points} more stamps needed
                         </p>
                       </div>
                     )}

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { BatteryCharging, Bell, BellOff, CalendarDays, Check, Clock, Hand, MapPin, Route, Wrench, Wifi } from "lucide-react";
+import { BatteryCharging, Bell, BellOff, CalendarDays, Check, Clock, Hand, MapPin, Navigation, Route, Stamp, Wrench, Wifi } from "lucide-react";
 import { events } from "../data/events";
 import { locations } from "../data/locations";
 import { useI18n } from "../i18n";
@@ -8,6 +8,7 @@ import LocationCard from "./LocationCard";
 import Modal from "./Modal";
 
 const LeafletMap = lazy(() => import("./LeafletMap"));
+const CURRENT_BENCH_ID = "ladywood-bench-central";
 
 const filters: Array<{ tag: LocationTag; labelKey: string; icon: React.ElementType }> = [
   { tag: "wifi", labelKey: "connect.filter.wifi", icon: Wifi },
@@ -15,7 +16,8 @@ const filters: Array<{ tag: LocationTag; labelKey: string; icon: React.ElementTy
   { tag: "digital-help", labelKey: "connect.filter.digital", icon: Hand },
   { tag: "refurbished-devices", labelKey: "connect.filter.devices", icon: Wrench },
   { tag: "events", labelKey: "connect.filter.events", icon: CalendarDays },
-  { tag: "accessible", labelKey: "connect.filter.accessible", icon: Check },
+  { tag: "stamps-offered", labelKey: "connect.filter.stamps", icon: Stamp },
+  { tag: "accessible", labelKey: "connect.filter.walking", icon: Check },
   { tag: "open-today", labelKey: "connect.filter.open", icon: Route }
 ];
 
@@ -39,18 +41,21 @@ function googleDirectionsUrl(location: MapLocation) {
 
 interface MapSectionProps {
   onAddReminder: (event: CommunityEvent) => void;
+  onRemoveReminder: (eventId: string) => void;
   reminders: CommunityEvent[];
 }
 
-export default function MapSection({ onAddReminder, reminders }: MapSectionProps) {
+export default function MapSection({ onAddReminder, onRemoveReminder, reminders }: MapSectionProps) {
   const { t } = useI18n();
   const allLocations = useMemo(() => locations, []);
+  const currentBench = useMemo(() => allLocations.find((l) => l.id === CURRENT_BENCH_ID) ?? null, [allLocations]);
   const [activeFilters, setActiveFilters] = useState<LocationTag[]>([]);
   const [debouncedFilters, setDebouncedFilters] = useState<LocationTag[]>([]);
-  const [selectedId, setSelectedId] = useState(allLocations[0].id);
+  const [selectedId, setSelectedId] = useState(CURRENT_BENCH_ID);
   const [notice, setNotice] = useState("");
   const [detailsLocation, setDetailsLocation] = useState<MapLocation | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CommunityEvent | null>(null);
+  const [activeTheme, setActiveTheme] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedFilters(activeFilters), 150);
@@ -104,6 +109,17 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
 
   const hasReminder = (event: CommunityEvent) => reminders.some((r) => r.id === event.id);
 
+  const allThemes = useMemo(() => {
+    const themes = new Set<string>();
+    events.forEach((event) => event.themes?.forEach((theme) => themes.add(theme)));
+    return Array.from(themes).slice(0, 8);
+  }, []);
+
+  const visibleEvents = useMemo(() => {
+    if (!activeTheme) return events;
+    return events.filter((event) => event.themes?.includes(activeTheme));
+  }, [activeTheme]);
+
   return (
     <section className="bg-white py-12">
       <div className="govuk-width-container">
@@ -113,10 +129,37 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
           <p className="mt-4 text-xl leading-relaxed text-slate-800">{t("connect.subtitle")}</p>
         </div>
 
+        {/* You are here banner */}
+        <div className="mb-5 flex items-center gap-3 border-2 border-amber-400 bg-amber-50 px-4 py-3">
+          <span className="text-xl" aria-hidden="true">📍</span>
+          <div className="flex-1">
+            <p className="font-black text-ink">You are here — Ladywood Community Connect Bench</p>
+            <p className="text-sm font-semibold text-slate-700">Near St Vincent Street West · Free Wi-Fi and charging available</p>
+          </div>
+          {selectedId !== CURRENT_BENCH_ID && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedId(CURRENT_BENCH_ID);
+                setNotice("Returned to the current bench — Ladywood Community Connect Bench.");
+              }}
+              className="govuk-button govuk-button--secondary shrink-0 px-3 py-2 text-sm"
+            >
+              <Navigation size={14} aria-hidden="true" />
+              Return to bench
+            </button>
+          )}
+        </div>
+
         <div className="mb-6 flex flex-wrap gap-2" aria-label={t("connect.filters")}>
           {filters.map((filter) => {
             const Icon = filter.icon;
             const isActive = activeFilters.includes(filter.tag);
+            const label = filter.tag === "accessible"
+              ? "Walking distance"
+              : filter.tag === "stamps-offered"
+              ? "Stamps offered"
+              : t(filter.labelKey);
             return (
               <button
                 key={filter.tag}
@@ -128,7 +171,7 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
                 aria-pressed={isActive}
               >
                 <Icon size={16} aria-hidden="true" />
-                {t(filter.labelKey)}
+                {label}
               </button>
             );
           })}
@@ -157,6 +200,7 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
                 selectedLocation={selectedLocation}
                 onSelect={handleSelect}
                 onMoreInfo={handleMoreInfo}
+                currentBench={currentBench}
               />
             </Suspense>
           </div>
@@ -180,19 +224,49 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
 
         {/* Events section */}
         <div className="mt-12">
-          <div className="mb-6">
+          <div className="mb-4">
             <h2 className="text-3xl font-black text-ink">Upcoming Events</h2>
             <p className="mt-2 text-lg text-slate-700">Free community events in Ladywood this month. Save a reminder to your dashboard.</p>
           </div>
+
+          {/* Theme filter chips */}
+          <div className="mb-5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTheme(null)}
+              className={`border-2 border-ink px-3 py-1 text-sm font-bold ${!activeTheme ? "bg-ink text-white" : "bg-white text-ink hover:bg-lagoon-50"}`}
+            >
+              All
+            </button>
+            {allThemes.map((theme) => (
+              <button
+                key={theme}
+                type="button"
+                onClick={() => setActiveTheme(activeTheme === theme ? null : theme)}
+                className={`border-2 border-ink px-3 py-1 text-sm font-bold ${activeTheme === theme ? "bg-ink text-white" : "bg-white text-ink hover:bg-lagoon-50"}`}
+              >
+                {theme}
+              </button>
+            ))}
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {events.map((event) => {
+            {visibleEvents.map((event) => {
               const saved = hasReminder(event);
               const colourClass = categoryColour[event.category] ?? "bg-slate-100 text-slate-700";
               return (
                 <article key={event.id} className="govuk-panel flex flex-col p-5">
-                  <span className={`inline-block self-start px-2 py-1 text-xs font-bold ${colourClass}`}>
-                    {event.category}
-                  </span>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className={`inline-block self-start px-2 py-1 text-xs font-bold ${colourClass}`}>
+                      {event.category}
+                    </span>
+                    {event.stampsOffered && (
+                      <span className="flex items-center gap-1 bg-sun-100 px-2 py-1 text-xs font-bold text-ink">
+                        <Stamp size={12} aria-hidden="true" />
+                        Stamps
+                      </span>
+                    )}
+                  </div>
                   <h3 className="mt-3 text-lg font-black text-ink">{event.name}</h3>
                   <p className="mt-1 flex items-center gap-1 text-sm font-bold text-slate-700">
                     <CalendarDays size={14} aria-hidden="true" />
@@ -217,16 +291,15 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
                     </button>
                     <button
                       type="button"
-                      onClick={() => { if (!saved) onAddReminder(event); }}
-                      disabled={saved}
-                      className={`flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 ${
+                      onClick={() => { if (saved) onRemoveReminder(event.id); else onAddReminder(event); }}
+                      className={`flex items-center gap-2 border-2 px-4 py-2 text-sm font-bold ${
                         saved
-                          ? "border-green-600 bg-green-50 text-green-700"
+                          ? "border-green-600 bg-green-50 text-green-700 hover:bg-red-50 hover:border-red-600 hover:text-red-700"
                           : "govuk-button"
                       }`}
                     >
                       {saved ? <BellOff size={14} aria-hidden="true" /> : <Bell size={14} aria-hidden="true" />}
-                      {saved ? "Reminder saved" : "Add reminder"}
+                      {saved ? "Remove reminder" : "Add reminder"}
                     </button>
                   </div>
                 </article>
@@ -304,9 +377,17 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
         <Modal labelledBy="event-details-title" onClose={() => setSelectedEvent(null)}>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <span className={`inline-block px-2 py-1 text-xs font-bold ${categoryColour[selectedEvent.category] ?? "bg-slate-100 text-slate-700"}`}>
-                {selectedEvent.category}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`inline-block px-2 py-1 text-xs font-bold ${categoryColour[selectedEvent.category] ?? "bg-slate-100 text-slate-700"}`}>
+                  {selectedEvent.category}
+                </span>
+                {selectedEvent.stampsOffered && (
+                  <span className="flex items-center gap-1 bg-sun-100 px-2 py-1 text-xs font-bold text-ink">
+                    <Stamp size={12} aria-hidden="true" />
+                    Stamps offered
+                  </span>
+                )}
+              </div>
               <h2 id="event-details-title" className="mt-2 text-3xl font-black">
                 {selectedEvent.name}
               </h2>
@@ -328,14 +409,20 @@ export default function MapSection({ onAddReminder, reminders }: MapSectionProps
             <InfoRow label="Help offered" value={selectedEvent.helpOffered} />
             <InfoRow label="Accessibility" value={selectedEvent.accessibility} />
             {selectedEvent.contact && <InfoRow label="Contact" value={selectedEvent.contact} />}
+            {selectedEvent.transportNote && <InfoRow label="Getting there" value={selectedEvent.transportNote} />}
+            {selectedEvent.sourceNote && <InfoRow label="Organised by" value={selectedEvent.sourceNote} />}
           </dl>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             {hasReminder(selectedEvent) ? (
-              <div className="flex items-center gap-2 font-bold text-green-700">
-                <BellOff size={18} aria-hidden="true" />
-                Reminder already saved
-              </div>
+              <button
+                type="button"
+                onClick={() => { onRemoveReminder(selectedEvent.id); setSelectedEvent(null); }}
+                className="govuk-button govuk-button--secondary flex-1 px-5 py-3"
+              >
+                <BellOff size={16} aria-hidden="true" />
+                Remove reminder
+              </button>
             ) : (
               <button
                 type="button"
