@@ -130,11 +130,11 @@ export default function MapSection({ onAddReminder, onRemoveReminder, reminders 
         </div>
 
         {/* You are here banner */}
-        <div className="mb-5 flex items-center gap-3 border-2 border-amber-400 bg-amber-50 px-4 py-3">
-          <span className="text-xl" aria-hidden="true">📍</span>
+        <div className="mb-5 flex items-center gap-3 border-2 border-ink bg-lagoon-100 px-4 py-3">
+          <MapPin size={20} className="shrink-0 text-ink" aria-hidden="true" />
           <div className="flex-1">
             <p className="font-black text-ink">You are here — Ladywood Community Connect Bench</p>
-            <p className="text-sm font-semibold text-slate-700">Near St Vincent Street West · Free Wi-Fi and charging available</p>
+            <p className="text-sm font-semibold text-slate-700">Near St Vincent Street West</p>
           </div>
           {selectedId !== CURRENT_BENCH_ID && (
             <button
