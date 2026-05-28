@@ -67,7 +67,7 @@ export default function Home({ onNavigate }: HomeProps) {
         <div className="home-hero-real__overlay" aria-hidden="true" />
         <div className="govuk-width-container home-hero-real__content">
           <div className="max-w-3xl">
-            <h1 className="text-5xl font-black leading-tight tracking-normal text-white md:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-black leading-tight tracking-normal text-white sm:text-5xl md:text-6xl lg:text-7xl">
               {t("home.title")}
             </h1>
             <p className="mt-6 max-w-2xl text-xl font-semibold leading-relaxed text-white md:text-2xl">

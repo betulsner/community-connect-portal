@@ -31,10 +31,15 @@ There is no real authentication. The "login" is `demo / connect123` which sets `
 
 | Route | Component | Notes |
 |---|---|---|
-| `#home` | `Home.tsx` | Landing, 4 feature cards |
+| `#home` | `Home.tsx` | Landing, feature cards |
 | `#connect` | `ConnectCity.tsx` → `MapSection.tsx` | Map + filter + events with reminders |
 | `#digital` | `DigitalHelp.tsx` | 8 help topics with expandable guides |
-| `#refurbishment` | `Refurbishment.tsx` | Device points + eligibility/tariff links |
+| `#refurbishment` | `Refurbishment.tsx` | Nav label is **"Device Support"**; device hubs, National Devicebank, eligibility links |
+| `#access-data` | `AccessData.tsx` | Free SIM, mobile data, social tariffs |
+| `#free-sim` | `FreeSim.tsx` | Free SIM card schemes |
+| `#affordable-internet` | `AffordableInternet.tsx` | Low-cost broadband deals |
+| `#donate` | `Donate.tsx` | Device donation flow |
+| `#volunteer` | `Volunteer.tsx` | Digital Champion volunteering |
 | `#stamps` | `Stamps.tsx` | Demo-only stamp/rewards page |
 | `#dashboard` | `Dashboard.tsx` | Demo-only user dashboard |
 | `#about` | `About.tsx` | Project info, fake team, bench request form |
@@ -71,20 +76,49 @@ The floating `Chatbot.tsx` posts to `/api/chat`. The system prompt restricts the
 
 The API key is **never** committed. `.env.local` is gitignored. Conversation content is never logged server-side (only error names on failure).
 
+### Navbar
+
+`Navbar.tsx` has three layout zones inside `.site-header__inner`:
+1. **Logo** — always visible.
+2. **`.site-nav`** — desktop nav links, shown at **`min-width: 1400px`** (hidden below that). Nav links use `white-space: normal` and `max-width: 118px` so long translated labels wrap to two lines rather than overflowing. Gap between links is `0.1rem`.
+3. **`.site-header__actions`** — always visible; contains `AccessibilityControls`, an optional Stamps icon button (demo mode only), and the Dashboard/Login button. Uses `margin-inline-start: auto` (logical property, RTL-safe). Below 1400 px a hamburger **`.site-menu-button`** is shown here instead of the desktop nav.
+
+"My Stamps" appears **only** in `site-header__actions` (compact icon button) and in the mobile menu — it was removed from the desktop `site-nav` to prevent overflow when logged in.
+
 ### Styling
 
 Tailwind CSS with custom utility classes in `index.css`. GovUK-inspired design system:
 - `.govuk-panel` — bordered card
 - `.govuk-button` — green primary button; `.govuk-button--secondary` — blue outline
-- `.govuk-inset` — left-bordered notice
+- `.govuk-inset` — uses `border-inline-start` (logical, RTL-safe)
 - `.hc-panel` — panel compatible with any contrast setting
 - Colour tokens: `text-ink` (#0b0c0c), `bg-lagoon-50/700`, `bg-sun-100/600`
 
 All buttons/inputs have `border-radius: 0` globally (GovUK convention) except `.govuk-button` which has `border-radius: 6px`.
 
+RTL hero gradient is mirrored via `[dir="rtl"] .home-hero-real__overlay` so the dark text overlay appears on the correct (reading-start) side for Arabic, Persian, and Kurdish.
+
 ### i18n
 
-`src/i18n.tsx` provides a React context with 7 languages (English, Urdu, Punjabi, Bengali, Polish, Arabic, Romanian). All UI strings should use `const { t } = useI18n()` and be keyed in `i18n.tsx`. Arabic/Urdu switch the document to `dir="rtl"`.
+`src/i18n.tsx` provides a React context with **11 languages**, all with complete coverage of every UI key (~100 keys each):
+
+| Language | Script | Direction |
+|---|---|---|
+| English | Latin | LTR |
+| Chinese | CJK | LTR |
+| Polish | Latin | LTR |
+| Persian | Arabic script | **RTL** |
+| Arabic | Arabic script | **RTL** |
+| French | Latin | LTR |
+| Somali | Latin | LTR |
+| Punjabi | Gurmukhi | LTR |
+| Spanish | Latin | LTR |
+| Kurdish (Sorani) | Arabic script | **RTL** |
+| Dutch | Latin | LTR |
+
+All UI strings must use `const { t } = useI18n()` and be keyed in `i18n.tsx`. The `t(key, fallback?)` function has a 3-level fallback: active dict → English → fallback → key. Never hardcode UI text in components.
+
+**RTL**: `App.tsx` sets `document.documentElement.dir` to `"rtl"` when the language is Arabic, Persian, or Kurdish; `"ltr"` for all others. Mobile menu link alignment uses `text-align: start` (logical) for correct RTL behaviour.
 
 ### Deployment
 

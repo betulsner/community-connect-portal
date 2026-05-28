@@ -2,53 +2,63 @@ import type { RefurbishmentPoint } from "../types";
 
 export const refurbishmentPoints: RefurbishmentPoint[] = [
   {
-    id: "rework-ladywood",
-    name: "Rework Ladywood Device Point",
-    area: "Icknield Port Road",
-    openDays: "Thursday 11:00-16:00, Saturday 10:00-13:00",
-    offers: ["Refurbished laptops", "Basic repairs", "Device setup", "Donation drop-off"],
-    cost: "Free checks; low-cost repairs",
-    contact: "Walk in or ask at Bridge Street Community Cafe",
-    accessibility: "Ground-floor entrance with appointment slots for quieter support."
-  },
-  {
-    id: "spring-hill-device-desk",
-    name: "Spring Hill Library Device Desk",
-    area: "Spring Hill",
-    openDays: "Tuesday-Friday 10:00-15:00",
-    offers: ["Device support applications", "Printing and scanning", "Social tariff guidance"],
-    cost: "Free",
-    contact: "Library help desk",
-    accessibility: "Ramp access, large-print forms, and seated waiting area."
-  },
-  {
-    id: "canal-side-repair",
-    name: "Canal Side Repair Table",
-    area: "Canal Side Community Room",
-    openDays: "Last Saturday of each month",
-    offers: ["Phone checks", "Laptop cleaning", "Battery advice", "Referral for repairs"],
-    cost: "Free advice; parts priced before work",
-    contact: "Book through the portal events list",
-    accessibility: "Step-free room with nearby accessible parking."
-  },
-  {
-    id: "data-bank-help",
-    name: "Ladywood Mobile Data Support",
-    area: "Ladywood Health and Community Centre",
-    openDays: "Monday and Wednesday 10:00-14:00",
-    offers: ["Mobile data SIM support", "National Databank-style referrals", "Phone setup"],
+    id: "birmingham-united-foundation",
+    name: "Birmingham United Foundation",
+    area: "Birmingham, B19 area",
+    address: "Birmingham B19 — contact for exact address",
+    openDays: "Contact for current availability",
+    offers: ["Refurbished laptops", "Tablets", "Device setup help", "Digital skills support"],
     cost: "Free if eligible",
-    contact: "Ask for the digital inclusion worker",
-    accessibility: "Level entrance, quiet appointments, and translation support by request."
+    contact: "Email to request a device",
+    email: "info@birminghamutd.com",
+    accessibility: "Accessible building — contact for specific access needs.",
+    devicesAvailable: true,
+    eligibility: [
+      "Receiving Universal Credit, PIP, ESA, JSA, Pension Credit, or Housing Benefit",
+      "Household income below the low income threshold",
+      "No working device at home",
+      "Living in Birmingham"
+    ],
+    mapLocationId: "birmingham-united-foundation"
   },
   {
-    id: "bridge-cafe-donations",
-    name: "Bridge Street Laptop Donation Point",
-    area: "Bridge Street",
-    openDays: "Monday-Saturday 08:00-18:00",
-    offers: ["Laptop donation drop-off", "Charger collection", "Reward vouchers", "Setup referrals"],
-    cost: "Free donation point",
-    contact: "Speak to cafe staff at the counter",
-    accessibility: "Wide doorway and staff support for heavy items."
+    id: "pitch2progress",
+    name: "Pitch2Progress",
+    area: "Birmingham, B9 area",
+    address: "Birmingham B9 — contact for exact address",
+    openDays: "Contact for current availability",
+    offers: ["Refurbished laptops", "Phones", "Device setup help"],
+    cost: "Free if eligible",
+    contact: "Email to request a device",
+    email: "contact@pitch2progress.co.uk",
+    accessibility: "Accessible building — contact for specific access needs.",
+    devicesAvailable: true,
+    eligibility: [
+      "Receiving means-tested benefits",
+      "Low income household",
+      "No suitable device at home",
+      "Referred by a community partner or self-referral"
+    ],
+    mapLocationId: "pitch2progress"
+  },
+  {
+    id: "ways-for-wellbeing",
+    name: "Ways for Wellbeing UK CIC",
+    area: "Ladywood, Birmingham B18",
+    address: "Ladywood, Birmingham B18 — contact for exact address",
+    openDays: "Contact for current availability",
+    offers: ["Refurbished devices", "Setup and support", "Wellbeing referrals"],
+    cost: "Free if eligible",
+    contact: "Email to request a device",
+    email: "Info@waysforwellbeing.com",
+    accessibility: "Accessible building — contact for specific access needs.",
+    devicesAvailable: false,
+    eligibility: [
+      "Living in Ladywood or surrounding area",
+      "Receiving qualifying benefits",
+      "No access to a working device",
+      "Referred by a GP, social worker, or community organisation"
+    ],
+    mapLocationId: "ways-for-wellbeing"
   }
 ];

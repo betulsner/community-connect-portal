@@ -57,6 +57,7 @@ export default function App() {
     }
   });
   const [settings, setSettings] = useState<PortalSettings>(settingsFromStorage);
+  const [connectPreselectId, setConnectPreselectId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleHashChange = () => setActivePage(pageFromHash());
@@ -71,7 +72,7 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(settingsKey, JSON.stringify(settings));
     document.documentElement.lang = settings.language.toLowerCase();
-    document.documentElement.dir = settings.language === "Arabic" || settings.language === "Urdu" ? "rtl" : "ltr";
+    document.documentElement.dir = ["Arabic", "Persian", "Kurdish"].includes(settings.language) ? "rtl" : "ltr";
     document.documentElement.classList.toggle("large-text", settings.largeText);
   }, [settings]);
 
@@ -79,6 +80,12 @@ export default function App() {
     setActivePage(page);
     window.history.replaceState(null, "", `#${page}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /** Navigate to the Connect map and pre-select a specific location marker. */
+  const navigateToMap = (locationId?: string) => {
+    if (locationId) setConnectPreselectId(locationId);
+    navigate("connect");
   };
 
   const addReminder = (event: CommunityEvent) => {
@@ -106,14 +113,23 @@ export default function App() {
   };
 
   const renderPage = () => {
-    if (activePage === "connect") return <ConnectCity onAddReminder={addReminder} onRemoveReminder={removeReminder} reminders={reminders} />;
+    if (activePage === "connect") return (
+      <ConnectCity
+        onAddReminder={addReminder}
+        onRemoveReminder={removeReminder}
+        reminders={reminders}
+        user={user}
+        preselectId={connectPreselectId}
+        onPreselectConsumed={() => setConnectPreselectId(null)}
+      />
+    );
     if (activePage === "digital") return <DigitalHelp onNavigate={navigate} />;
-    if (activePage === "refurbishment") return <Refurbishment onNavigate={navigate} />;
+    if (activePage === "refurbishment") return <Refurbishment onNavigate={navigate} onNavigateToMap={navigateToMap} />;
     if (activePage === "volunteer") return <Volunteer onNavigate={navigate} />;
     if (activePage === "donate") return <Donate onNavigate={navigate} />;
     if (activePage === "free-sim") return <FreeSim onNavigate={navigate} />;
     if (activePage === "affordable-internet") return <AffordableInternet onNavigate={navigate} />;
-    if (activePage === "access-data") return <AccessData onNavigate={navigate} />;
+    if (activePage === "access-data") return <AccessData onNavigate={navigate} onNavigateToMap={navigateToMap} />;
     if (activePage === "stamps") {
       if (user?.mode !== "demo") { navigate("login"); return null; }
       return <Stamps user={user} onNavigate={navigate} />;

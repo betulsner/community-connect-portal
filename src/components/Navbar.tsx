@@ -75,16 +75,6 @@ export default function Navbar({
               </button>
             );
           })}
-          {user?.mode === "demo" && (
-            <button
-              type="button"
-              onClick={onStamps}
-              className={`site-nav__link ${activePage === "stamps" ? "site-nav__link--active" : ""}`}
-              aria-current={activePage === "stamps" ? "page" : undefined}
-            >
-              My Stamps
-            </button>
-          )}
         </div>
 
         <div className="site-header__actions">

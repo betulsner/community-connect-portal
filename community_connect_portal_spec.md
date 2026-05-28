@@ -109,10 +109,10 @@ The home page should feel like a calm local public service portal and guide user
 The header is a clean civic-style bar with:
 
 - Logo/name: Community Connect (left)
-- Navigation links (desktop): Home, Connect with the City, Digital Help, Refurbishment, Events
-- Compact accessibility controls (right): language selector, A-/A+, high contrast
-- Green Dashboard button (far right)
-- Mobile: navigation collapses into a simple Menu
+- Navigation links (desktop, shown at ≥ 1400 px): Home, Connect with the City, Digital Help, Device Support, Access Data, About and Contact
+- Compact accessibility controls (right): language selector (11 languages), A-/A+ text size toggle
+- Stamps icon button (demo mode only) and green Dashboard/Login button (far right)
+- Mobile (< 1400 px): navigation collapses into a hamburger Menu
 
 ### Hero (Implemented)
 
@@ -408,17 +408,25 @@ Include:
 - Reduce animation/motion
 - Text-only mode for low data use
 
-### Suggested Languages
+### Implemented Languages
 
-Include at least:
+The portal currently supports 11 languages, chosen to match actual Ladywood census demographics:
 
-- English
-- Urdu
-- Punjabi
-- Bengali
-- Polish
-- Arabic
-- Romanian
+| Language | Demographic note | Direction |
+|---|---|---|
+| English | 76.6 % of Ladywood residents | LTR |
+| Chinese | 4.3 % | LTR |
+| Polish | 1.7 % | LTR |
+| Persian / Farsi | 1.7 % | RTL |
+| Arabic | 1.4 % | RTL |
+| French | 1.0 % | LTR |
+| Somali | 0.9 % | LTR |
+| Punjabi | 0.7 % | LTR |
+| Spanish | 0.7 % | LTR |
+| Kurdish (Sorani) | 0.6 % | RTL |
+| Dutch | Community addition | LTR |
+
+All 11 languages have complete translations for every UI string. RTL languages (Persian, Arabic, Kurdish) flip the document direction and mirror the hero overlay gradient automatically.
 
 ### Accessibility Note
 

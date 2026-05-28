@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Bot, Loader2, Send, X } from "lucide-react";
+import { useI18n } from "../i18n";
 import type { PageId } from "../types";
 
 interface ChatbotProps {
@@ -11,14 +12,8 @@ interface Message {
   text: string;
 }
 
-const suggestions = [
-  "Find free Wi-Fi nearby",
-  "I need device support",
-  "Show local events",
-  "Help me understand a form",
-];
-
 export default function Chatbot({ onNavigate }: ChatbotProps) {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [everOpened, setEverOpened] = useState(false);
   const [input, setInput] = useState("");
@@ -27,11 +22,13 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-open after short delay
+  // Auto-open after short delay — desktop only (≥768px), never on mobile
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsOpen(true);
-      setEverOpened(true);
+      if (window.innerWidth >= 768) {
+        setIsOpen(true);
+        setEverOpened(true);
+      }
     }, 800);
     return () => clearTimeout(timer);
   }, []);
@@ -39,8 +36,8 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
   // Focus input when opened
   useEffect(() => {
     if (isOpen) {
-      const t = setTimeout(() => inputRef.current?.focus(), 80);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => inputRef.current?.focus(), 80);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -93,13 +90,15 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
     }
   };
 
+  const suggestions = [t("chat.q1"), t("chat.q2"), t("chat.q3"), t("chat.q4")];
+
   return (
     <>
       {/* Full chat panel — always rendered, shown/hidden via CSS */}
       <div
         className={`ch-panel ${isOpen ? "ch-panel--open" : "ch-panel--closed"}`}
         role="dialog"
-        aria-label="City Helper chat"
+        aria-label={t("chat.name")}
         aria-modal="false"
         aria-hidden={!isOpen}
       >
@@ -108,14 +107,14 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
             <Bot size={20} />
           </div>
           <div className="ch-panel__title">
-            <span className="ch-panel__name">City Helper</span>
-            <span className="ch-panel__sub">Local digital support guide</span>
+            <span className="ch-panel__name">{t("chat.name")}</span>
+            <span className="ch-panel__sub">{t("chat.subtitle")}</span>
           </div>
           <button
             type="button"
             className="ch-panel__close"
             onClick={() => setIsOpen(false)}
-            aria-label="Close City Helper"
+            aria-label={t("chat.close")}
             tabIndex={isOpen ? 0 : -1}
           >
             <X size={17} aria-hidden="true" />
@@ -124,15 +123,15 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
 
         <div className="ch-panel__body">
           <div className="ch-panel__notice">
-            Messages are sent to OpenAI to generate responses. Do not share your NHS number, date of birth, or passwords.
+            {t("chat.notice")}
           </div>
 
           <div className="ch-panel__bubble ch-panel__bubble--bot">
-            Hi, I&rsquo;m City Helper. I can help you find free Wi&#8209;Fi, device support, local events, digital help, or explain something confusing.
+            {t("chat.greeting")}
           </div>
 
           <p className="ch-panel__disclaimer">
-            AI may not always be accurate. For urgent or official help, contact a local support service.
+            {t("chat.disclaimer")}
           </p>
 
           {messages.length === 0 && (
@@ -164,7 +163,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
           {loading && (
             <div className="ch-panel__bubble ch-panel__bubble--bot ch-panel__bubble--loading">
               <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-              Thinking…
+              {t("chat.thinking")}
             </div>
           )}
 
@@ -178,7 +177,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
             className="ch-panel__shortcut"
             tabIndex={isOpen ? 0 : -1}
           >
-            Map
+            {t("chat.map")}
           </button>
           <button
             type="button"
@@ -186,7 +185,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
             className="ch-panel__shortcut"
             tabIndex={isOpen ? 0 : -1}
           >
-            Events
+            {t("chat.events")}
           </button>
           <button
             type="button"
@@ -194,7 +193,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
             className="ch-panel__shortcut"
             tabIndex={isOpen ? 0 : -1}
           >
-            Devices
+            {t("chat.devices")}
           </button>
           <button
             type="button"
@@ -202,7 +201,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
             className="ch-panel__shortcut"
             tabIndex={isOpen ? 0 : -1}
           >
-            Internet
+            {t("chat.internet")}
           </button>
         </div>
 
@@ -214,14 +213,14 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
           }}
         >
           <label htmlFor="ch-input" className="sr-only">
-            Ask City Helper
+            {t("chat.name")}
           </label>
           <input
             id="ch-input"
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything…"
+            placeholder={t("chat.placeholder")}
             disabled={loading}
             className="ch-panel__input"
             tabIndex={isOpen ? 0 : -1}
@@ -230,7 +229,7 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
             type="submit"
             disabled={loading || !input.trim()}
             className="ch-panel__send"
-            aria-label="Send message"
+            aria-label={t("chat.button")}
             tabIndex={isOpen ? 0 : -1}
           >
             <Send size={15} aria-hidden="true" />
@@ -240,12 +239,12 @@ export default function Chatbot({ onNavigate }: ChatbotProps) {
 
       {/* Circular FAB — shown when panel is closed */}
       <div className={`ch-fab-wrap ${isOpen ? "ch-fab-wrap--hidden" : "ch-fab-wrap--visible"}`}>
-        <span className="ch-fab__label" aria-hidden="true">Need help?</span>
+        <span className="ch-fab__label" aria-hidden="true">{t("chat.fabLabel")}</span>
         <button
           type="button"
           className={`ch-fab${!everOpened ? " ch-fab--pulse" : ""}`}
           onClick={open}
-          aria-label="Open City Helper"
+          aria-label={t("chat.button")}
         >
           <Bot size={26} aria-hidden="true" />
         </button>

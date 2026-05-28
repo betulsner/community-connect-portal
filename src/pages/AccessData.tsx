@@ -3,6 +3,7 @@ import type { PageId } from "../types";
 
 interface AccessDataProps {
   onNavigate: (page: PageId) => void;
+  onNavigateToMap?: (locationId: string) => void;
 }
 
 const eligibilityBenefits = [
@@ -21,41 +22,42 @@ const freeSimOrgs: Array<{
   area: string;
   contact: string;
   note: string;
-  mapLabel?: string;
+  mapLocationId?: string;
 }> = [
   {
     name: "A Father's Child Services CIC",
     area: "Ladywood and Newtown",
     contact: "Contact via local community boards or ask at the bench.",
     note: "Referrals for families and individuals without mobile data.",
-    mapLabel: "Ladywood Community Connect Bench"
+    mapLocationId: "afcs-cic"
   },
   {
     name: "Age UK Birmingham",
     area: "Across Birmingham",
     contact: "0121 437 0033",
-    note: "Free SIM and data support for older adults."
+    note: "Free SIM and data support for older adults.",
+    mapLocationId: "age-uk-birmingham"
   },
   {
-    name: "Action for Children",
-    area: "Birmingham",
-    contact: "Ask at Ladywood Digital Drop-in",
+    name: "Birmingham Community Children Centre (Action for Children)",
+    area: "Bacchus Road, B18",
+    contact: "Ask at the centre",
     note: "Data support for families with children in need.",
-    mapLabel: "Ladywood Digital Drop-in"
+    mapLocationId: "birmingham-community-children"
   },
   {
-    name: "British Red Cross",
-    area: "West Midlands",
-    contact: "Ask at Spring Hill Library Hub",
+    name: "British Red Cross – Birmingham",
+    area: "Lowe Street, B12",
+    contact: "Ask at the Red Cross Birmingham office",
     note: "Emergency connectivity support including SIM cards.",
-    mapLabel: "Spring Hill Library Hub"
+    mapLocationId: "british-red-cross"
   },
   {
     name: "Ladywood Digital Drop-in",
     area: "Ladywood Health and Community Centre",
-    contact: "Ask at reception — Mon, Wed, Fri 10:00-15:00",
+    contact: "Ask at reception — Mon, Wed, Fri 10:00–15:00",
     note: "Referrals to National Databank and local SIM distribution.",
-    mapLabel: "Ladywood Digital Drop-in"
+    mapLocationId: "ladywood-health-centre"
   }
 ];
 
@@ -70,7 +72,15 @@ const providers = [
   { name: "VOXI (Vodafone)", price: "From £10/month", speed: "4G/5G mobile", note: "Unlimited social media data on some plans.", url: "https://www.voxi.co.uk/" }
 ];
 
-export default function AccessData({ onNavigate }: AccessDataProps) {
+export default function AccessData({ onNavigate, onNavigateToMap }: AccessDataProps) {
+  const handleFindOnMap = (locationId?: string) => {
+    if (locationId && onNavigateToMap) {
+      onNavigateToMap(locationId);
+    } else {
+      onNavigate("connect");
+    }
+  };
+
   return (
     <section className="bg-white py-12">
       <div className="govuk-width-container">
@@ -133,15 +143,12 @@ export default function AccessData({ onNavigate }: AccessDataProps) {
                     <p className="mt-2 text-sm font-bold text-slate-700">Contact: {org.contact}</p>
                     <button
                       type="button"
-                      onClick={() => onNavigate("connect")}
+                      onClick={() => handleFindOnMap(org.mapLocationId)}
                       className="govuk-button govuk-button--secondary mt-4 flex items-center gap-1 self-start px-3 py-2 text-sm"
                     >
                       <MapPin size={13} aria-hidden="true" />
-                      {org.mapLabel ? `Find on map` : "Show on map"}
+                      Find on map
                     </button>
-                    {org.mapLabel && (
-                      <p className="mt-1 text-xs text-slate-500">Look for "{org.mapLabel}" on the map</p>
-                    )}
                   </article>
                 ))}
               </div>
@@ -184,18 +191,22 @@ export default function AccessData({ onNavigate }: AccessDataProps) {
             </div>
           </div>
 
-          {/* Already have a phone */}
+          {/* Need a device too */}
           <div className="govuk-panel bg-lagoon-50 p-5 max-w-3xl">
             <Smartphone size={22} className="text-lagoon-700" aria-hidden="true" />
             <h3 className="mt-3 text-xl font-black text-ink">Need a device too?</h3>
             <p className="mt-2 text-base text-slate-700">
-              If you need a phone or laptop as well as data, the Refurbishment page lists local pickup points for free and low-cost devices.
+              If you need a phone or laptop as well as data, the Refurbishment page lists local hubs for free and low-cost devices.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <button type="button" onClick={() => onNavigate("refurbishment")} className="govuk-button px-5 py-3">
                 Find a refurbished device
               </button>
-              <button type="button" onClick={() => onNavigate("connect")} className="govuk-button govuk-button--secondary px-5 py-3">
+              <button
+                type="button"
+                onClick={() => onNavigate("connect")}
+                className="govuk-button govuk-button--secondary px-5 py-3"
+              >
                 <MapPin size={14} aria-hidden="true" />
                 Find local support on the map
               </button>

@@ -21,7 +21,12 @@ export type LocationTag =
   | "events"
   | "stamps-offered"
   | "accessible"
-  | "open-today";
+  | "walking-distance"
+  | "open-today"
+  | "bench"
+  | "drop-in"
+  | "digital-inclusion"
+  | "device-hub";
 
 export type LocationType =
   | "Community Connect Bench"
@@ -30,7 +35,9 @@ export type LocationType =
   | "Library and Community Space"
   | "Refurbishment Point"
   | "Free Wi-Fi Point"
-  | "Local Event";
+  | "Local Event"
+  | "Digital Inclusion Centre"
+  | "Device Hub";
 
 export interface MapLocation {
   id: string;
@@ -58,7 +65,7 @@ export interface MapLocation {
     website?: string;
   };
   tags: LocationTag[];
-  coordinates: {
+  coordinates?: {
     x: number;
     y: number;
   };
@@ -83,6 +90,12 @@ export interface RefurbishmentPoint {
   cost: string;
   contact: string;
   accessibility: string;
+  devicesAvailable?: boolean;
+  eligibility?: string[];
+  email?: string;
+  mapLocationId?: string;
+  address?: string;
+  website?: string;
 }
 
 export interface CommunityEvent {
@@ -99,9 +112,11 @@ export interface CommunityEvent {
   locationId?: string;
   contact?: string;
   stampsOffered?: boolean;
+  stampsCount?: number;
   themes?: string[];
   transportNote?: string;
   sourceNote?: string;
+  coordinatesLatLng?: { lat: number; lng: number };
 }
 
 export interface Partner {
